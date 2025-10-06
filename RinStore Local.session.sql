@@ -38,4 +38,20 @@ CREATE TABLE IF NOT EXISTS product_items(
   product_item_price DECIMAL(10, 2),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS variations(
+  variation_id SERIAL PRIMARY KEY,
+  category_id INT NOT NULL REFERENCES categories(category_id) ON DELETE RESTRICT,
+  variation_name VARCHAR(255) NOT NULL,
+  variation_slug VARCHAR(255) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS variation_options(
+  variation_option_id SERIAL PRIMARY KEY,
+  variation_id INT NOT NULL REFERENCES variations(variation_id) ON DELETE RESTRICT,
+  variation_option_value VARCHAR(255) NOT NULL,
+  variation_option_slug VARCHAR(255) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
 )

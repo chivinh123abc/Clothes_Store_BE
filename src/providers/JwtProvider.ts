@@ -1,8 +1,8 @@
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken'
 import type { StringValue } from 'ms'
-import { user } from '../modules/types/user.js'
+import { UserEntity } from '../modules/types/user.js'
 
-const generateTokens = async (userInfo: user, secretSignature: string, tokenLife: StringValue | number): Promise<string> => {
+const generateTokens = async (userInfo: UserEntity, secretSignature: string, tokenLife: StringValue | number): Promise<string> => {
   try {
     const generateUser = {
       user_id: userInfo.user_id,
