@@ -1,5 +1,6 @@
 import express from 'express'
 import { categoryRoute } from '../modules/categories/category.route.js'
+import { productConfigurationRoute } from '../modules/product_configurations/product_configurations.route.js'
 import { productItemRoute } from '../modules/product_items/product_item.route.js'
 import { productRoute } from '../modules/products/product.route.js'
 import { userRoute } from '../modules/users/user.route.js'
@@ -19,5 +20,7 @@ Router.use('/product_item', productItemRoute)
 Router.use('/variation', variationRoute)
 
 Router.use('/variation_option', variationOptionRoute)
+
+Router.use('/product_configuration', productConfigurationRoute)
 
 export const APIs = Router

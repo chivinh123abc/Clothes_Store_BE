@@ -54,4 +54,11 @@ CREATE TABLE IF NOT EXISTS variation_options(
   variation_option_slug VARCHAR(255) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS product_configurations(
+  product_item_id INT NOT NULL REFERENCES product_items(product_item_id) ON DELETE RESTRICT,
+  variation_option_id INT NOT NULL REFERENCES variation_options(variation_option_id) ON DELETE RESTRICT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP,
+  PRIMARY KEY (product_item_id, variation_option_id)
 )

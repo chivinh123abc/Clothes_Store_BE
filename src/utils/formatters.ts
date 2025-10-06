@@ -31,3 +31,21 @@ export const pickUser = (user: UserEntity): UserResponseDto | null => {
     'is_destroy'
   ]) as UserResponseDto
 }
+
+export const generateSKUwithSlug = (slug: string, charsFromFirstWord = 2) => {
+  if (!slug) return null
+
+  //Tach thanh cac tu
+  const parts = slug.split('-')
+  if (parts.length === 0) {
+    return ''
+  }
+  let sku = ''
+  //Lay n ky tu tu dau tien va viet hoa 
+  for (let i = 0; i < Math.min(parts.length); i++) {
+    sku += parts[i].slice(0, charsFromFirstWord).toUpperCase()
+  }
+  const numbers = parts.join('').match(/\d+/g)?.join('') || ''
+  sku += numbers
+  return sku
+}
