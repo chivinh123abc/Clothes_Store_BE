@@ -61,4 +61,14 @@ CREATE TABLE IF NOT EXISTS product_configurations(
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
   PRIMARY KEY (product_item_id, variation_option_id)
+);
+CREATE TYPE order_status AS ENUM ('pending', 'paid', 'shipped');
+CREATE TABLE IF NOT EXISTS orders(
+  order_id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  status order_status NOT NULL DEFAULT 'pending',
+  total_amount DECIMAL(10, 2),
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
 )

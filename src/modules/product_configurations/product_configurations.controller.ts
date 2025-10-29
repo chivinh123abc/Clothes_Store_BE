@@ -11,6 +11,18 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const update = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const updatedProductConfiguration = await productConfigurationService.update(req.body)
+    res.status(StatusCodes.CREATED).json(updatedProductConfiguration)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+
 export const productConfigurationController = {
-  createNew
+  createNew,
+  update
 }
