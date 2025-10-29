@@ -2,15 +2,17 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import Joi from 'joi'
 import ApiError from '../../utils/ApiError.js'
+import { OrderStatus } from '../constants/orders.enum.js'
 
 const createNew = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
-    product_item_id: Joi.number().integer().min(1).required(),
-    variation_option_id: Joi.number().integer().min(1).required()
+    user_id: Joi.number().integer().min(1).required(),
+    status: Joi.string().valid(...Object.values(OrderStatus)).default(OrderStatus.PENDING),
+    total_amount: Joi.number().precision(2).min(0).default(0),
+    comment: Joi.string().min(5).max(255).optional()
   })
-
   try {
-    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    req.body = await correctCondition.validateAsync(req.body)
     next()
   } catch (error) {
     let errorMessage = 'Unaccepted input'
@@ -26,14 +28,13 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
-    old_product_item_id: Joi.number().integer().min(1).required(),
-    old_variation_option_id: Joi.number().integer().min(1).required(),
-    new_product_item_id: Joi.number().integer().min(1).required(),
-    new_variation_option_id: Joi.number().integer().min(1).required()
-  })
-
+    user_id: Joi.number().integer().min(1).optional(),
+    status: Joi.string().valid(...Object.values(OrderStatus)).optional(),
+    total_amount: Joi.number().precision(2).min(0).optional(),
+    comment: Joi.string().min(5).max(255).optional()
+  }).min(1)
   try {
-    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    req.body = await correctCondition.validateAsync(req.body)
     next()
   } catch (error) {
     let errorMessage = 'Unaccepted input'
@@ -47,8 +48,8 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-
-export const productConfigurationValidation = {
+export const orderValidation = {
   createNew,
   update
 }
+
