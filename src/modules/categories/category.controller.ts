@@ -13,7 +13,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const getCategory = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const category_id = Number(req.params?.category_id)
+    const category_id = req.body.category_id
 
     const thisCategory = await categoryService.getCategory(category_id)
     res.status(StatusCodes.ACCEPTED).json(thisCategory)
@@ -23,7 +23,7 @@ const getCategory = async (req: Request, res: Response, next: NextFunction) => {
 }
 const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const category_id = Number(req.params?.category_id)
+    const category_id = req.body.category_id
     const updatedCategory = await categoryService.updateCategory(category_id, req.body)
     res.status(StatusCodes.ACCEPTED).json(updatedCategory)
   } catch (error) {

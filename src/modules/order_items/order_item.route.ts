@@ -4,9 +4,8 @@ import { orderItemValidation } from './order_item.validation.js'
 
 const Router = express.Router()
 
-Router.route('/create')
-  .post(orderItemValidation.createNew, orderItemController.createNew)
 Router.route('/')
+  .post(orderItemValidation.createNew, orderItemController.createNew)
   .get(orderItemController.getOrderItemById)
 
 export const orderItemRoute = Router

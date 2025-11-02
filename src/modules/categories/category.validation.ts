@@ -25,6 +25,7 @@ export const createNew = async (req: Request, res: Response, next: NextFunction)
 
 export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
+    category_id: Joi.number().integer().min(1).required(),
     category_name: Joi.string().min(4).max(255).optional()
   }).min(1)
   try {

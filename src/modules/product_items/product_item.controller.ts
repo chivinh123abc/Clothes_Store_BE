@@ -13,7 +13,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const getProductItem = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product_item_id = Number(req.params.product_item_id)
+    const product_item_id = req.body.product_item_id
 
     const gotProductItem = await productItemService.getProductItem(product_item_id)
     res.status(StatusCodes.CREATED).json(gotProductItem)
@@ -24,7 +24,7 @@ const getProductItem = async (req: Request, res: Response, next: NextFunction) =
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product_item_id = Number(req.params.product_item_id)
+    const product_item_id = req.body.product_item_id
     const updateData = {
       product_item_id: product_item_id,
       ...req.body

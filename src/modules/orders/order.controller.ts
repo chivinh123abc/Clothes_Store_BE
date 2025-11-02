@@ -13,7 +13,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const n_order_id = req.params.order_id
+    const n_order_id = req.body.order_id
     const reqBody = {
       order_id: n_order_id,
       ...req.body
@@ -25,9 +25,9 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-const getOrder = async (req: Request, res: Response, next: NextFunction) => {
+const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const order_id = Number(req.params.order_id)
+    const order_id = req.body.order_id
     const gotOrder = await orderService.getOrder(order_id)
     res.status(StatusCodes.ACCEPTED).json(gotOrder)
   } catch (error) {
@@ -38,5 +38,5 @@ const getOrder = async (req: Request, res: Response, next: NextFunction) => {
 export const orderController = {
   createNew,
   update,
-  getOrder
+  getOrderById
 }

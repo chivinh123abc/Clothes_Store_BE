@@ -4,10 +4,8 @@ import { productConfigurationValidation } from './product_configurations.validat
 
 const Router = express.Router()
 
-Router.route('/create')
+Router.route('/')
   .post(productConfigurationValidation.createNew, productConfigurationController.createNew)
-
-Router.route('/update')
   .put(productConfigurationValidation.update, productConfigurationController.update)
 
 export const productConfigurationRoute = Router

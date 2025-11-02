@@ -13,7 +13,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const getProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product_id = Number(req?.params?.product_id)
+    const product_id = req.body.product_id
 
     const gotProduct = await productService.getProduct(product_id)
     res.status(StatusCodes.ACCEPTED).json(gotProduct)
@@ -24,7 +24,7 @@ const getProduct = async (req: Request, res: Response, next: NextFunction) => {
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const product_id = Number(req?.params?.product_id)
+    const product_id = req.body.product_id
     const updatedProduct = await productService.update(product_id, req.body)
     res.status(StatusCodes.ACCEPTED).json(updatedProduct)
   } catch (error) {

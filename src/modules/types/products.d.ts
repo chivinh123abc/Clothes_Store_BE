@@ -5,6 +5,7 @@ export interface ProductCreateDto {
 }
 
 export interface ProductUpdateDto {
+  product_id: number
   product_name?: string,
   product_slug?: string,
   category_id?: number
