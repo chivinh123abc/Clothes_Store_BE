@@ -28,6 +28,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
+    variation_option_id: Joi.number().integer().min(1).optional(),
     variation_id: Joi.number().integer().min(1).optional(),
     variation_option_value: Joi.string().optional(),
   }).min(1)

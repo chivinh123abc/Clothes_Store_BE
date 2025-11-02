@@ -3,9 +3,10 @@ import { variationController } from './variation.controller.js'
 import { variationValidation } from './variation.validation.js'
 const Router = express.Router()
 
-Router.route('/create').post(variationValidation.createNew, variationController.createNew)
-
-Router.route('/:variation_id')
+// VARIATION la nhung type de chia theo vd(Color, Size)
+Router.route('/')
+  .post(variationValidation.createNew, variationController.createNew)
   .put(variationValidation.update, variationController.update)
   .get(variationController.getVariation)
+
 export const variationRoute = Router

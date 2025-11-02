@@ -13,7 +13,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const getVariation = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const variation_id = Number(req.params.variation_id)
+    const variation_id = req.body.variation_id
     const result = await variationService.getVaration(variation_id)
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
@@ -23,7 +23,7 @@ const getVariation = async (req: Request, res: Response, next: NextFunction) => 
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    req.body.variation_id = Number(req.params.variation_id)
+    req.body.variation_id = req.body.variation_id
     const result = await variationService.update(req.body)
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {

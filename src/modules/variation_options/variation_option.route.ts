@@ -3,10 +3,8 @@ import { variationOptionController } from './variation_option.controller.js'
 import { variationOptionValidation } from './variation_option.validation.js'
 const Router = express.Router()
 
-Router.route('/create')
+Router.route('/')
   .post(variationOptionValidation.createNew, variationOptionController.createNew)
-
-Router.route('/:variation_option_id')
   .get(variationOptionController.getVariationOptionById)
   .put(variationOptionValidation.update, variationOptionController.update)
 

@@ -4,9 +4,8 @@ import { productValidation } from './product.validation.js'
 
 const Router = express.Router()
 
-Router.route('/create').post(productValidation.createNew, productController.createNew)
-
-Router.route('/:product_id')
+Router.route('/')
+  .post(productValidation.createNew, productController.createNew)
   .get(productController.getProduct)
   .put(productValidation.update, productController.update)
 

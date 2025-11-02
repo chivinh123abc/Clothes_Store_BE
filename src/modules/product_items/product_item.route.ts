@@ -4,9 +4,9 @@ import { productItemValidation } from './product_item.validation.js'
 
 const Router = express.Router()
 
-Router.route('/create').post(productItemValidation.createNew, productItemController.createNew)
-
-Router.route('/:product_item_id')
+//chua co validation update
+Router.route('/')
+  .post(productItemValidation.createNew, productItemController.createNew)
   .get(productItemController.getProductItem)
   .put(productItemController.update)
 

@@ -13,7 +13,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const getVariationOptionById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const variation_option_id = Number(req.params.variation_option_id)
+    const variation_option_id = req.body.variation_option_id
 
     const foundVariationOption = await variationOptionService.getVariationOptionById(variation_option_id)
 
@@ -25,7 +25,7 @@ const getVariationOptionById = async (req: Request, res: Response, next: NextFun
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    req.body.variation_option_id = Number(req.params.variation_option_id)
+    req.body.variation_option_id = req.body.variation_option_id
     const updatedVariationOption = await variationOptionService.update(req.body)
     res.status(StatusCodes.ACCEPTED).json(updatedVariationOption)
   } catch (error) {
