@@ -1,5 +1,6 @@
 import express from 'express'
 import { categoryRoute } from '../modules/categories/category.route.js'
+import { orderItemRoute } from '../modules/order_items/order_item.route.js'
 import { orderRoute } from '../modules/orders/order.route.js'
 import { productConfigurationRoute } from '../modules/product_configurations/product_configurations.route.js'
 import { productItemRoute } from '../modules/product_items/product_item.route.js'
@@ -25,5 +26,7 @@ Router.use('/variation_option', variationOptionRoute)
 Router.use('/product_configuration', productConfigurationRoute)
 
 Router.use('/order', orderRoute)
+
+Router.use('/order_item', orderItemRoute)
 
 export const APIs = Router
