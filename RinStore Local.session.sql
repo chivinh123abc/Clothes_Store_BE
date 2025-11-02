@@ -62,7 +62,14 @@ CREATE TABLE IF NOT EXISTS product_configurations(
   updated_at TIMESTAMP,
   PRIMARY KEY (product_item_id, variation_option_id)
 );
-CREATE TYPE order_status AS ENUM ('pending', 'paid', 'shipped');
+--order
+DO $$ BEGIN IF NOT EXISTS (
+  SELECT 1
+  FROM pg_type
+  WHERE typname = 'order_status'
+) THEN CREATE TYPE order_status AS ENUM ('pending', 'paid', 'shipped');
+END IF;
+END $$;
 CREATE TABLE IF NOT EXISTS orders(
   order_id SERIAL PRIMARY KEY,
   user_id INT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
@@ -71,4 +78,13 @@ CREATE TABLE IF NOT EXISTS orders(
   comment TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
-)
+);
+CREATE TABLE IF NOT EXISTS order_items(
+  order_item_id SERIAL PRIMARY KEY,
+  order_id INT NOT NULL REFERENCES orders(order_id) ON DELETE RESTRICT,
+  product_item_id INT NOT NULL REFERENCES product_items(product_item_id) ON DELETE RESTRICT,
+  quantity INT NOT NULL,
+  unit_price DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
+);
