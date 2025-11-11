@@ -88,3 +88,18 @@ CREATE TABLE IF NOT EXISTS order_items(
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS carts(
+  cart_id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS cart_items(
+  cart_item_id SERIAL PRIMARY KEY,
+  cart_id INT NOT NULL REFERENCES carts(cart_id) ON DELETE RESTRICT,
+  product_item_id INT NOT NULL REFERENCES product_items(product_item_id) ON DELETE RESTRICT,
+  quantity INT NOT NULL,
+  price DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP
+)

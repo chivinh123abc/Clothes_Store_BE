@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
 import { orderModel } from '../orders/order.model.js'
 import { productItemModel } from '../product_items/product_item.model.js'
-import { OrderItemCreateDto, OrderItemGetDto, OrderItemResponseDto } from '../types/order_items.js'
+import { OrderItemCreateDto, OrderItemResponseDto, OrderItemUpdateDto } from '../types/order_items.js'
 import { orderItemModel } from './order_item.model.js'
 
 const createNew = async (reqBody: OrderItemCreateDto): Promise<OrderItemResponseDto> => {
@@ -39,9 +39,23 @@ const getOrderItemById = async (order_item_id: number): Promise<OrderItemRespons
   }
 }
 
+const update = async (reqBody: OrderItemUpdateDto) => {
+  try {
+    const existOrderItem = await orderItemModel.getOrderItemById(reqBody.order_item_id)
+    if (!existOrderItem) {
+      throw (new ApiError(StatusCodes.NOT_FOUND, 'Order item not exist'))
+    }
+
+    const result = await orderItemModel.update(reqBody)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
 
 
 export const orderItemService = {
   createNew,
-  getOrderItemById
+  getOrderItemById,
+  update
 }

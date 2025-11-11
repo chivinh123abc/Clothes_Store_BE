@@ -6,11 +6,11 @@ export interface OrderItemCreateDto {
 }
 
 export interface OrderItemUpdateDto {
-  order_item_id?: number,
+  order_item_id: number,
   // order_id?: number,
   // product_item_id?: number,
   quantity?: number,
-  unit_price?: number
+  // unit_price?: number
 }
 
 export interface OrderItemGetDto {
