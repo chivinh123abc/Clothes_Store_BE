@@ -7,5 +7,6 @@ const Router = express.Router()
 Router.route('/')
   .post(orderItemValidation.createNew, orderItemController.createNew)
   .get(orderItemController.getOrderItemById)
+  .put(orderItemValidation.update, orderItemController.update)
 
 export const orderItemRoute = Router
