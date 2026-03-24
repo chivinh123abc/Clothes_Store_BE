@@ -1,20 +1,20 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
-import { variationService } from './variation.service.js'
+import { variantService } from './variant.service.js'
 
 const createNew = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await variationService.createNew(req.body)
+    const result = await variantService.createNew(req.body)
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
     next(error)
   }
 }
 
-const getVariation = async (req: Request, res: Response, next: NextFunction) => {
+const getVariant = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const variation_id = req.body.variation_id
-    const result = await variationService.getVaration(variation_id)
+    const variant_id = req.body.variant_id
+    const result = await variantService.getVaration(variant_id)
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
     next(error)
@@ -23,16 +23,16 @@ const getVariation = async (req: Request, res: Response, next: NextFunction) => 
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    req.body.variation_id = req.body.variation_id
-    const result = await variationService.update(req.body)
+    req.body.variant_id = req.body.variant_id
+    const result = await variantService.update(req.body)
     res.status(StatusCodes.CREATED).json(result)
   } catch (error) {
     next(error)
   }
 }
 
-export const variationController = {
+export const variantController = {
   createNew,
-  getVariation,
+  getVariant,
   update
 }

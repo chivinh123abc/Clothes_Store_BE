@@ -5,14 +5,24 @@ info:
   description: API documentation for RinStore e-commerce
 
 servers:
-  - url: http://localhost:3000
+  - url: /
 
 tags:
   - name: Users
-    description: API cho quản lý user
+  - name: Categories
+  - name: Products
+  - name: Product Items
+  - name: Variants
+  - name: Variant Options
+  - name: Product Configurations
+  - name: Carts
+  - name: Cart Items
+  - name: Orders
+  - name: Order Items
 
 paths:
-  /users/register:
+  # USERS
+  /user/register:
     post:
       summary: Đăng ký user mới
       tags: [Users]
@@ -25,10 +35,8 @@ paths:
       responses:
         '201':
           description: User created successfully
-        '400':
-          description: Validation error
 
-  /users/info:
+  /user/info:
     get:
       summary: Lấy thông tin user
       tags: [Users]
@@ -38,7 +46,7 @@ paths:
         '200':
           description: User info
 
-  /users/login:
+  /user/login:
     post:
       summary: Đăng nhập
       tags: [Users]
@@ -52,24 +60,578 @@ paths:
         '200':
           description: Login success
 
+  /user/delete:
+    delete:
+      summary: Xóa user
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User deleted
+
+  /user/update:
+    put:
+      summary: Cập nhật thông tin user
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateDto'
+      responses:
+        '200':
+          description: User updated
+
+  /user/verify:
+    put:
+      summary: Xác minh tài khoản
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserVerifyAccountDTO'
+      responses:
+        '200':
+          description: Verified
+
+  /user/logout:
+    delete:
+      summary: Đăng xuất
+      tags: [Users]
+      responses:
+        '200':
+          description: Logout success
+
+  /user/refresh_token:
+    get:
+      summary: Refresh token
+      tags: [Users]
+      responses:
+        '200':
+          description: New token
+
+  # CATEGORIES
+  /category:
+    get:
+      summary: Lấy danh sách category
+      tags: [Categories]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo category mới
+      tags: [Categories]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật category
+      tags: [Categories]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # PRODUCTS
+  /product:
+    get:
+      summary: Lấy danh sách sản phẩm
+      tags: [Products]
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo sản phẩm
+      tags: [Products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật sản phẩm
+      tags: [Products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # PRODUCT ITEMS
+  /product_item:
+    get:
+      summary: Lấy danh sách Product Items
+      tags: [Product Items]
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Product Item
+      tags: [Product Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductItemCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật Product Item
+      tags: [Product Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductItemUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # VARIANTS
+  /variant:
+    get:
+      summary: Lấy danh sách Variant
+      tags: [Variants]
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Variant
+      tags: [Variants]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật Variant
+      tags: [Variants]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # VARIANT OPTIONS
+  /variant_option:
+    get:
+      summary: Lấy chi tiết Variant Option
+      tags: [Variant Options]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variant_option_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Variant Option
+      tags: [Variant Options]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantOptionCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật Variant Option
+      tags: [Variant Options]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VariantOptionUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # PRODUCT CONFIGURATIONS
+  /product_configuration:
+    post:
+      summary: Tạo Product Configuration
+      tags: [Product Configurations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductConfigurationCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật Product Configuration
+      tags: [Product Configurations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductConfigurationUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # CARTS
+  /cart:
+    get:
+      summary: Lấy chi tiết Cart
+      tags: [Carts]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Cart
+      tags: [Carts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartCreateDto'
+      responses:
+        '201':
+          description: Created
+
+  # CART ITEMS
+  /cart_item:
+    get:
+      summary: Lấy chi tiết Cart Item
+      tags: [Cart Items]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_item_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Cart Item
+      tags: [Cart Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemCreateDto'
+      responses:
+        '201':
+          description: Created
+
+  # ORDERS
+  /order:
+    get:
+      summary: Lấy chi tiết Order
+      tags: [Orders]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Order
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật Order
+      tags: [Orders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
+  # ORDER ITEMS
+  /order_item:
+    get:
+      summary: Lấy chi tiết Order Item
+      tags: [Order Items]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_item_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Tạo Order Item
+      tags: [Order Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemCreateDto'
+      responses:
+        '201':
+          description: Created
+    put:
+      summary: Cập nhật Order Item
+      tags: [Order Items]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemUpdateDto'
+      responses:
+        '200':
+          description: Updated
+
 components:
   schemas:
+    # Users
     UserRegisterDto:
       type: object
       properties:
-        email:
-          type: string
-        password:
-          type: string
-        username:
-          type: string
+        username: { type: string }
+        email: { type: string }
+        password: { type: string }
+        phone_number: { type: string }
+        avatar: { type: string }
     UserLoginDto:
       type: object
       properties:
-        email:
-          type: string
-        password:
-          type: string
+        email: { type: string }
+        password: { type: string }
+    UserUpdateDto:
+      type: object
+      properties:
+        username: { type: string }
+        email: { type: string }
+        password: { type: string }
+        phone_number: { type: string }
+        avatar: { type: string }
+        verify_token: { type: string }
+        is_active: { type: boolean }
+    UserVerifyAccountDTO:
+      type: object
+      properties:
+        email: { type: string }
+        verify_token: { type: string }
+    
+    # Categories
+    CategoryCreateDto:
+      type: object
+      properties:
+        category_name: { type: string }
+        category_slug: { type: string }
+    CategoryUpdateDto:
+      type: object
+      properties:
+        category_id: { type: integer }
+        category_name: { type: string }
+        category_slug: { type: string }
+    
+    # Products
+    ProductCreateDto:
+      type: object
+      properties:
+        product_name: { type: string }
+        product_slug: { type: string }
+        category_id: { type: integer }
+    ProductUpdateDto:
+      type: object
+      properties:
+        product_id: { type: integer }
+        product_name: { type: string }
+        product_slug: { type: string }
+        category_id: { type: integer }
+
+    # Product Items
+    ProductItemCreateDto:
+      type: object
+      properties:
+        product_item_id: { type: integer }
+        product_id: { type: integer }
+        stock_quantity: { type: integer }
+        product_item_price: { type: number }
+        sku: { type: string }
+        product_item_image: { type: string }
+    ProductItemUpdateDto:
+      type: object
+      properties:
+        product_item_id: { type: integer }
+        product_id: { type: integer }
+        stock_quantity: { type: integer }
+        product_item_price: { type: number }
+        sku: { type: string }
+        product_item_image: { type: string }
+    
+    # Variants
+    VariantCreateDto:
+      type: object
+      properties:
+        category_id: { type: integer }
+        variant_name: { type: string }
+        variant_slug: { type: string }
+    VariantUpdateDto:
+      type: object
+      properties:
+        variant_id: { type: integer }
+        category_id: { type: integer }
+        variant_name: { type: string }
+        variant_slug: { type: string }
+
+    # Variant Options
+    VariantOptionCreateDto:
+      type: object
+      properties:
+        variant_id: { type: integer }
+        variant_option_value: { type: string }
+        variant_option_slug: { type: string }
+    VariantOptionUpdateDto:
+      type: object
+      properties:
+        variant_option_id: { type: integer }
+        variant_id: { type: integer }
+        variant_option_value: { type: string }
+        variant_option_slug: { type: string }
+
+    # Product Configurations
+    ProductConfigurationCreateDto:
+      type: object
+      properties:
+        product_item_id: { type: integer }
+        variant_option_id: { type: integer }
+    ProductConfigurationUpdateDto:
+      type: object
+      properties:
+        old_product_item_id: { type: integer }
+        old_variant_option_id: { type: integer }
+        new_product_item_id: { type: integer }
+        new_variant_option_id: { type: integer }
+
+    # Carts
+    CartCreateDto:
+      type: object
+      properties:
+        user_id: { type: integer }
+
+    # Cart Items
+    CartItemCreateDto:
+      type: object
+      properties:
+        cart_item_id: { type: integer }
+        cart_id: { type: integer }
+        product_item_id: { type: integer }
+        quantity: { type: integer }
+        price: { type: number }
+
+    # Orders
+    OrderCreateDto:
+      type: object
+      properties:
+        user_id: { type: integer }
+        status: { type: string }
+        total_amount: { type: number }
+        comment: { type: string }
+    OrderUpdateDto:
+      type: object
+      properties:
+        order_id: { type: integer }
+        user_id: { type: integer }
+        status: { type: string }
+        total_amount: { type: number }
+        comment: { type: string }
+
+    # Order Items
+    OrderItemCreateDto:
+      type: object
+      properties:
+        order_id: { type: integer }
+        product_item_id: { type: integer }
+        quantity: { type: integer }
+        unit_price: { type: number }
+    OrderItemUpdateDto:
+      type: object
+      properties:
+        order_item_id: { type: integer }
+        quantity: { type: integer }
 
   securitySchemes:
     bearerAuth:

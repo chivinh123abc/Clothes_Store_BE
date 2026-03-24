@@ -23,7 +23,7 @@ const START_SERVER = () => {
   //Xu li loi
   app.use(errorHandlingMiddleware)
   if (env.BUILD_MODE === 'dev') {
-    app.listen(3000, () => {
+    app.listen(3000, '0.0.0.0', () => {
       console.log('[SERVER] Server running at http://localhost:3000/')
       console.log('Swagger docs at http://localhost:3000/api-docs')
     })

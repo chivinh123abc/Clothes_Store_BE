@@ -39,28 +39,28 @@ CREATE TABLE IF NOT EXISTS product_items(
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
 );
-CREATE TABLE IF NOT EXISTS variations(
-  variation_id SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS variants(
+  variant_id SERIAL PRIMARY KEY,
   category_id INT NOT NULL REFERENCES categories(category_id) ON DELETE RESTRICT,
-  variation_name VARCHAR(255) NOT NULL,
-  variation_slug VARCHAR(255) UNIQUE NOT NULL,
+  variant_name VARCHAR(255) NOT NULL,
+  variant_slug VARCHAR(255) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
 );
-CREATE TABLE IF NOT EXISTS variation_options(
-  variation_option_id SERIAL PRIMARY KEY,
-  variation_id INT NOT NULL REFERENCES variations(variation_id) ON DELETE RESTRICT,
-  variation_option_value VARCHAR(255) NOT NULL,
-  variation_option_slug VARCHAR(255) UNIQUE NOT NULL,
+CREATE TABLE IF NOT EXISTS variant_options(
+  variant_option_id SERIAL PRIMARY KEY,
+  variant_id INT NOT NULL REFERENCES variants(variant_id) ON DELETE RESTRICT,
+  variant_option_value VARCHAR(255) NOT NULL,
+  variant_option_slug VARCHAR(255) UNIQUE NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS product_configurations(
   product_item_id INT NOT NULL REFERENCES product_items(product_item_id) ON DELETE RESTRICT,
-  variation_option_id INT NOT NULL REFERENCES variation_options(variation_option_id) ON DELETE RESTRICT,
+  variant_option_id INT NOT NULL REFERENCES variant_options(variant_option_id) ON DELETE RESTRICT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP,
-  PRIMARY KEY (product_item_id, variation_option_id)
+  PRIMARY KEY (product_item_id, variant_option_id)
 );
 --order
 DO $$ BEGIN IF NOT EXISTS (

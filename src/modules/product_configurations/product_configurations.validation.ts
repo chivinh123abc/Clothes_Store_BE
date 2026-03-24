@@ -6,7 +6,7 @@ import ApiError from '../../utils/ApiError.js'
 const createNew = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
     product_item_id: Joi.number().integer().min(1).required(),
-    variation_option_id: Joi.number().integer().min(1).required()
+    variant_option_id: Joi.number().integer().min(1).required()
   })
 
   try {
@@ -27,9 +27,9 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 const update = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
     old_product_item_id: Joi.number().integer().min(1).required(),
-    old_variation_option_id: Joi.number().integer().min(1).required(),
+    old_variant_option_id: Joi.number().integer().min(1).required(),
     new_product_item_id: Joi.number().integer().min(1).required(),
-    new_variation_option_id: Joi.number().integer().min(1).required()
+    new_variant_option_id: Joi.number().integer().min(1).required()
   })
 
   try {

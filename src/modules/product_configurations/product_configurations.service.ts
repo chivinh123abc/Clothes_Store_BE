@@ -4,7 +4,7 @@ import { generateSKUwithSlug } from '../../utils/formatters.js'
 import { productItemModel } from '../product_items/product_item.model.js'
 import { productModel } from '../products/product.model.js'
 import { ProductConfigurationCreateDto, ProductConfigurationResponseDto, ProductConfigurationUpdateDto } from '../types/product_configurations.js'
-import { variationOptionModel } from '../variation_options/variation_option.model.js'
+import { variantOptionModel } from '../variant_options/variant_option.model.js'
 import { productConfigurationModel } from './product_configurations.model.js'
 
 
@@ -23,11 +23,11 @@ const createNew = async (reqBody: ProductConfigurationCreateDto): Promise<Produc
     } else if (existProductItem.sku) {
       throw new ApiError(StatusCodes.CONFLICT, 'This product item already exist sku')
     }
-    const existVariationOption = await variationOptionModel.getVariationOptionById(reqBody.variation_option_id)
-    if (!existVariationOption) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Variation option not exist with this variation_option_id')
-    } else if (!existVariationOption?.variation_option_value) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Variation option not exist variation_option_value')
+    const existVariantOption = await variantOptionModel.getVariantOptionById(reqBody.variant_option_id)
+    if (!existVariantOption) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'variant option not exist with this variant_option_id')
+    } else if (!existVariantOption?.variant_option_value) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'variant option not exist variant_option_value')
     }
     const existProduct = await productModel.findProductById(existProductItem.product_id)
     if (!existProduct) {
@@ -42,7 +42,7 @@ const createNew = async (reqBody: ProductConfigurationCreateDto): Promise<Produc
 
     skuUpdater += generateSKUwithSlug(existProduct?.product_slug)
     skuUpdater += '-'
-    skuUpdater += generateSKUwithSlug(existVariationOption?.variation_option_value)
+    skuUpdater += generateSKUwithSlug(existVariantOption?.variant_option_value)
 
     const existProductSKU = await productItemModel.findProductItemBySKU(skuUpdater)
     if (existProductSKU) {
@@ -64,7 +64,7 @@ const update = async (reqBody: ProductConfigurationUpdateDto) => {
   try {
     const existPrimaryKey = await productConfigurationModel.isExistPrimaryKey({
       product_item_id: reqBody.old_product_item_id,
-      variation_option_id: reqBody.old_variation_option_id
+      variant_option_id: reqBody.old_variant_option_id
     })
     if (!existPrimaryKey) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'This both key value is not exist, please do available pair')
@@ -80,11 +80,11 @@ const update = async (reqBody: ProductConfigurationUpdateDto) => {
     } else if (existProductItem.sku && (reqBody.new_product_item_id !== reqBody.old_product_item_id)) {
       throw new ApiError(StatusCodes.CONFLICT, 'This product item already exist sku')
     }
-    const existVariationOption = await variationOptionModel.getVariationOptionById(reqBody.new_variation_option_id)
-    if (!existVariationOption) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Variation option not exist with this variation_option_id')
-    } else if (!existVariationOption?.variation_option_value) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Variation option not exist variation_option_value')
+    const existVariantOption = await variantOptionModel.getVariantOptionById(reqBody.new_variant_option_id)
+    if (!existVariantOption) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'variant option not exist with this variant_option_id')
+    } else if (!existVariantOption?.variant_option_value) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'variant option not exist variant_option_value')
     }
     const existProduct = await productModel.findProductById(existProductItem.product_id)
     if (!existProduct) {
@@ -97,7 +97,7 @@ const update = async (reqBody: ProductConfigurationUpdateDto) => {
 
     skuUpdater += generateSKUwithSlug(existProduct?.product_slug)
     skuUpdater += '-'
-    skuUpdater += generateSKUwithSlug(existVariationOption?.variation_option_value)
+    skuUpdater += generateSKUwithSlug(existVariantOption?.variant_option_value)
 
     const existProductSKU = await productItemModel.findProductItemBySKU(skuUpdater)
     if (existProductSKU) {

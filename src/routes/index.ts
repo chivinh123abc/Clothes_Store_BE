@@ -8,8 +8,8 @@ import { productConfigurationRoute } from '../modules/product_configurations/pro
 import { productItemRoute } from '../modules/product_items/product_item.route.js'
 import { productRoute } from '../modules/products/product.route.js'
 import { userRoute } from '../modules/users/user.route.js'
-import { variationOptionRoute } from '../modules/variation_options/variation_option.route.js'
-import { variationRoute } from '../modules/variations/variation.route.js'
+import { variantOptionRoute } from '../modules/variant_options/variant_option.route.js'
+import { variantRoute } from '../modules/variants/variant.route.js'
 
 const Router = express.Router()
 
@@ -21,9 +21,9 @@ Router.use('/product', productRoute)
 
 Router.use('/product_item', productItemRoute)
 
-Router.use('/variation', variationRoute)
+Router.use('/variant', variantRoute)
 
-Router.use('/variation_option', variationOptionRoute)
+Router.use('/variant_option', variantOptionRoute)
 
 Router.use('/product_configuration', productConfigurationRoute)
 

@@ -4,9 +4,10 @@ import Joi from 'joi'
 import ApiError from '../../utils/ApiError.js'
 
 const createNew = async (req: Request, res: Response, next: NextFunction) => {
+
   const correctCondition = Joi.object({
-    category_id: Joi.number().integer().min(1).required(),
-    variation_name: Joi.string().min(4).max(255).required()
+    variant_id: Joi.number().integer().min(1).required(),
+    variant_option_value: Joi.string().required(),
   })
 
   try {
@@ -27,9 +28,9 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
-    variation_id: Joi.number().integer().min(1).required(),
-    category_id: Joi.number().integer().min(1).optional(),
-    variation_name: Joi.string().min(4).max(255).optional()
+    variant_option_id: Joi.number().integer().min(1).optional(),
+    variant_id: Joi.number().integer().min(1).optional(),
+    variant_option_value: Joi.string().optional(),
   }).min(1)
 
   try {
@@ -48,7 +49,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export const variationValidation = {
+export const variantOptionValidation = {
   createNew,
   update
 }

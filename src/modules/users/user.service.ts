@@ -62,7 +62,7 @@ const getUser = async (reqBody: { user_id: number }): Promise<UserEntity> => {
 const update = async (user_id: number, reqBody: UserUpdateDto): Promise<UserResponseDto | null> => {
 
   try {
-    const existUser = userModel.findUserById(user_id)
+    const existUser = await userModel.findUserById(user_id)
 
     if (!existUser) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User is not exist')
