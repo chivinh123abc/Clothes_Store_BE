@@ -3,12 +3,16 @@ import { StringValue } from 'ms'
 
 export const env = {
   BUILD_MODE: process.env.BUILD_MODE,
+  HOST: process.env.HOST,
+  PORT: process.env.PORT,
   //DB
   DB_HOST: process.env.DB_HOST,
   DB_PORT: process.env.DB_PORT,
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_NAME: process.env.DB_NAME,
+
+  CLIENT_URL: process.env.CLIENT_URL as string,
 
   ACCESS_TOKEN_SECRET_SIGNATURE: process.env.ACCESS_TOKEN_SECRET_SIGNATURE as string,
   ACCESS_TOKEN_LIFE: process.env.ACCESS_TOKEN_LIFE as StringValue | number,

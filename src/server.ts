@@ -12,20 +12,31 @@ import { APIs } from './routes/index.js'
 const START_SERVER = () => {
   const app = express()
 
-  app.use(cors())
+  //phan ben trong {} dung de chi dinh BE origin va FE tu domain khac, nen la phai dung
+  app.use(cors({
+    origin: env.CLIENT_URL,
+    credentials: true
+  }))
   app.use(express.json())
-
   app.use(cookieParser())
   // dung swagger UI
   setupSwagger(app)
 
-  app.use('/', APIs)
+  //check alive
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok' })
+  })
+
+  app.use('/api/v1', APIs)
   //Xu li loi
   app.use(errorHandlingMiddleware)
+  const PORT = Number(env.PORT) || 3000;
+  const HOST = env.HOST || '0.0.0.0'
   if (env.BUILD_MODE === 'dev') {
-    app.listen(3000, '0.0.0.0', () => {
-      console.log('[SERVER] Server running at http://localhost:3000/')
-      console.log('Swagger docs at http://localhost:3000/api-docs')
+    app.listen(PORT, HOST, () => {
+      console.log(`[SERVER] Server running at http://localhost:${PORT}/`)
+      console.log(`Health check at http://localhost:${PORT}/health`)
+      console.log(`Swagger docs at http://localhost:${PORT}/api-docs`)
     })
   }
   // EXIT HOOK
