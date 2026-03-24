@@ -15,7 +15,7 @@ const getVariantOptionById = async (req: Request, res: Response, next: NextFunct
   try {
     const variant_option_id = req.body.variant_option_id
 
-    const foundVariantOption = await variantOptionService.getvariantOptionById(variant_option_id)
+    const foundVariantOption = await variantOptionService.getVariantOptionById(variant_option_id)
 
     res.status(StatusCodes.CREATED).json(foundVariantOption)
   } catch (error) {
