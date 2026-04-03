@@ -32,13 +32,13 @@ const START_SERVER = () => {
   app.use(errorHandlingMiddleware)
   const PORT = Number(env.PORT) || 3000;
   const HOST = env.HOST || '0.0.0.0'
-  if (env.BUILD_MODE === 'dev') {
-    app.listen(PORT, HOST, () => {
-      console.log(`[SERVER] Server running at http://localhost:${PORT}/`)
+  app.listen(PORT, HOST, () => {
+    console.log(`[SERVER] Server running at http://${HOST}:${PORT}/`)
+    if (env.BUILD_MODE === 'dev') {
       console.log(`Health check at http://localhost:${PORT}/health`)
       console.log(`Swagger docs at http://localhost:${PORT}/api-docs`)
-    })
-  }
+    }
+  })
   // EXIT HOOK
   asyncExitHook(async () => {
     console.log('[SERVER]: Server is shutting down')

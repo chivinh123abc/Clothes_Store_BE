@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Cấu hình container API Node.js
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rinstore_api
+    restart: always
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy # Đợi CSDL PostgreSQL khởi động xong mới chạy API
+    volumes:
+      - ./logs:/app/logs # Map local directory để lưu lại logs
+
+  # Cấu hình container Database PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: rinstore_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-rinstore}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-rinstore}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Khởi tạo volume dùng để lưu trữ dữ liệu DB được bền vững sau khi tắt container
+volumes:
+  postgres_data:

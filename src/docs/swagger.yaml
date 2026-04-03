@@ -5,7 +5,7 @@ info:
   description: API documentation for RinStore e-commerce
 
 servers:
-  - url: /
+  - url: /api/v1
 
 tags:
   - name: Users
@@ -486,8 +486,6 @@ components:
         password: { type: string }
         phone_number: { type: string }
         avatar: { type: string }
-        verify_token: { type: string }
-        is_active: { type: boolean }
     UserVerifyAccountDTO:
       type: object
       properties:
@@ -499,34 +497,29 @@ components:
       type: object
       properties:
         category_name: { type: string }
-        category_slug: { type: string }
     CategoryUpdateDto:
       type: object
       properties:
         category_id: { type: integer }
         category_name: { type: string }
-        category_slug: { type: string }
     
     # Products
     ProductCreateDto:
       type: object
       properties:
         product_name: { type: string }
-        product_slug: { type: string }
         category_id: { type: integer }
     ProductUpdateDto:
       type: object
       properties:
         product_id: { type: integer }
         product_name: { type: string }
-        product_slug: { type: string }
         category_id: { type: integer }
 
     # Product Items
     ProductItemCreateDto:
       type: object
       properties:
-        product_item_id: { type: integer }
         product_id: { type: integer }
         stock_quantity: { type: integer }
         product_item_price: { type: number }
@@ -548,14 +541,12 @@ components:
       properties:
         category_id: { type: integer }
         variant_name: { type: string }
-        variant_slug: { type: string }
     VariantUpdateDto:
       type: object
       properties:
         variant_id: { type: integer }
         category_id: { type: integer }
         variant_name: { type: string }
-        variant_slug: { type: string }
 
     # Variant Options
     VariantOptionCreateDto:
@@ -563,14 +554,12 @@ components:
       properties:
         variant_id: { type: integer }
         variant_option_value: { type: string }
-        variant_option_slug: { type: string }
     VariantOptionUpdateDto:
       type: object
       properties:
         variant_option_id: { type: integer }
         variant_id: { type: integer }
         variant_option_value: { type: string }
-        variant_option_slug: { type: string }
 
     # Product Configurations
     ProductConfigurationCreateDto:
@@ -596,11 +585,9 @@ components:
     CartItemCreateDto:
       type: object
       properties:
-        cart_item_id: { type: integer }
         cart_id: { type: integer }
         product_item_id: { type: integer }
         quantity: { type: integer }
-        price: { type: number }
 
     # Orders
     OrderCreateDto:
@@ -626,7 +613,6 @@ components:
         order_id: { type: integer }
         product_item_id: { type: integer }
         quantity: { type: integer }
-        unit_price: { type: number }
     OrderItemUpdateDto:
       type: object
       properties:

@@ -1,0 +1,21 @@
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
+Γ£à Connected to PostgreSQL
+[SERVER]: Server is shutting down
+[DATABASE]: Database is shutting down
