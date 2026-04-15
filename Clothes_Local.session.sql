@@ -32,6 +32,16 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS discounts (
+    discount_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    discount_percent INT NOT NULL,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS product_items (
     product_item_id SERIAL PRIMARY KEY,
     product_id INT NOT NULL REFERENCES products (product_id) ON DELETE RESTRICT,
@@ -39,6 +49,7 @@ CREATE TABLE IF NOT EXISTS product_items (
     stock_quantity INT,
     product_item_image TEXT,
     product_item_price DECIMAL(10, 2),
+    discount_id INT REFERENCES discounts (discount_id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP
 );

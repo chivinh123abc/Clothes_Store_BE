@@ -28,6 +28,15 @@ const isAuthorized = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
+const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.jwtDecoded?.role !== 1) {
+    next(new ApiError(StatusCodes.FORBIDDEN, 'Forbidden (Admin only)'))
+    return
+  }
+  next()
+}
+
 export const authMiddleware = {
-  isAuthorized
+  isAuthorized,
+  isAdmin
 }
