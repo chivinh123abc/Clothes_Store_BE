@@ -23,10 +23,21 @@ const create = async (reqBody: UserRegisterDto): Promise<UserResponseDto> => {
 const findUserByEmail = async (email: string): Promise<UserEntity | null> => {
   const result = await pool.query(
     `
-      SELECT user_id, username, password, email, phone_number, avatar, created_at, updated_at, is_active, is_destroy
+      SELECT user_id, username, password, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy
       FROM users
       WHERE email = $1 AND is_destroy = false
     `, [email]
+  )
+  return result.rows.length > 0 ? result.rows[0] : null
+}
+
+const findUserByIdentifier = async (identifier: string): Promise<UserEntity | null> => {
+  const result = await pool.query(
+    `
+      SELECT user_id, username, password, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy
+      FROM users
+      WHERE (email = $1 OR username = $1) AND is_destroy = false
+    `, [identifier]
   )
   return result.rows.length > 0 ? result.rows[0] : null
 }
@@ -35,7 +46,7 @@ const findUserByEmail = async (email: string): Promise<UserEntity | null> => {
 const findUserById = async (user_id: number): Promise<UserEntity | null> => {
   const result = await pool.query(
     `
-      SELECT user_id, username, password, email, phone_number, avatar, created_at, updated_at, is_active, is_destroy
+      SELECT user_id, username, password, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy
       FROM users
       WHERE user_id = $1 AND is_destroy = false
     `,
@@ -84,6 +95,7 @@ export const userModel = {
   create,
   findUserById,
   findUserByEmail,
+  findUserByIdentifier,
   update,
   softDelete
 }

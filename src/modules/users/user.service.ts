@@ -99,7 +99,7 @@ const softDelete = async (user_id: number): Promise<UserResponseDto> => {
 
 const login = async (reqBody: UserLoginDto): Promise<AuthResponseDto> => {
   try {
-    const existUser = await userModel.findUserByEmail(reqBody.email)
+    const existUser = await userModel.findUserByIdentifier(reqBody.identifier)
 
     if (!existUser) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User is not exist')

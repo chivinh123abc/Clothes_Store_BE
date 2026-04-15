@@ -76,8 +76,30 @@ const update = async (product_id: number, reqBody: ProductUpdateDto): Promise<Pr
   }
 }
 
+const getAll = async (): Promise<ProductResponseDto[]> => {
+  try {
+    return await productModel.findAll()
+  } catch (error) {
+    throw error
+  }
+}
+
+const deleteProduct = async (product_id: number): Promise<boolean> => {
+  try {
+    const existProduct = await productModel.findProductById(product_id)
+    if (!existProduct) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Product not found')
+    }
+    return await productModel.deleteProduct(product_id)
+  } catch (error) {
+    throw error
+  }
+}
+
 export const productService = {
   createNew,
   getProduct,
-  update
+  update,
+  getAll,
+  deleteProduct
 }

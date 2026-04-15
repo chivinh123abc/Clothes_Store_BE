@@ -64,9 +64,29 @@ const update = async (product_id: number, reqBody: ProductUpdateDto): Promise<Pr
   return updatedProduct.rows[0]
 }
 
+const findAll = async (): Promise<ProductResponseDto[]> => {
+  const result = await pool.query(`
+    SELECT p.product_id, p.product_name, p.product_slug, p.category_id, c.category_name, p.created_at, p.updated_at
+    FROM products p
+    JOIN categories c ON p.category_id = c.category_id
+    ORDER BY p.created_at DESC
+  `)
+  return result.rows
+}
+
+const deleteProduct = async (product_id: number): Promise<boolean> => {
+  const result = await pool.query(`
+    DELETE FROM products
+    WHERE product_id = $1
+  `, [product_id])
+  return (result.rowCount ?? 0) > 0
+}
+
 export const productModel = {
   create,
   findProductById,
   findProductBySlug,
-  update
+  update,
+  findAll,
+  deleteProduct
 }

@@ -14,7 +14,7 @@ export interface UserVerifyAccountDTO {
 }
 
 export interface UserLoginDto {
-  email: string,
+  identifier: string,
   password: string
 }
 
@@ -35,6 +35,7 @@ export interface UserResponseDto {
   phone_number?: string
   avatar?: string
   is_active?: boolean
+  role?: number
   created_at?: Date
   updated_at?: Date,
   is_destroy?: boolean,
@@ -56,6 +57,7 @@ export interface UserEntity {
   updated_at?: Date | null
   is_destroy?: boolean
   is_active?: boolean
+  role?: number
   verify_token?: string
   access_token?: string,
   refresh_token?: string

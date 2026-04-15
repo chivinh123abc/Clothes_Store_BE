@@ -24,6 +24,7 @@ export const pickUser = (user: UserEntity): UserResponseDto | null => {
     'email',
     'username',
     'phone_number',
+    'role',
     'avatar',
     'is_active',
     'created_at',

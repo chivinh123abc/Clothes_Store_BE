@@ -5,7 +5,9 @@ import ApiError from '../../utils/ApiError.js'
 
 export const createNew = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
-    username: Joi.string().min(8).max(255).required(),
+    username: Joi.string().min(8).max(255).pattern(/^[^@]+$/).required().messages({
+      'string.pattern.base': 'Username cannot contain the "@" symbol.'
+    }),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
     phone_number: Joi.string().pattern(/^[0-9]+$/).optional(),
@@ -30,7 +32,9 @@ export const createNew = async (req: Request, res: Response, next: NextFunction)
 
 export const update = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
-    username: Joi.string().min(8).max(255).optional(),
+    username: Joi.string().min(8).max(255).pattern(/^[^@]+$/).optional().messages({
+      'string.pattern.base': 'Username cannot contain the "@" symbol.'
+    }),
     email: Joi.string().email().optional(),
     password: Joi.string().min(6).optional(),
     phone_number: Joi.string().pattern(/^[0-9]+$/).optional(),
@@ -77,7 +81,7 @@ export const verifyAccount = async (req: Request, res: Response, next: NextFunct
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
-    email: Joi.string().email().required(),
+    identifier: Joi.string().required(),
     password: Joi.string().min(6).required()
   })
 
