@@ -6,7 +6,7 @@ import ApiError from '../utils/ApiError.js'
 
 
 const isAuthorized = async (req: Request, res: Response, next: NextFunction) => {
-  const clientAccessToken = req.cookies?.accessToken
+  const clientAccessToken = req.cookies?.access_token
 
   if (!clientAccessToken) {
     next(new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized (token not found)'))

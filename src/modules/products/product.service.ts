@@ -96,10 +96,19 @@ const deleteProduct = async (product_id: number): Promise<boolean> => {
   }
 }
 
+const getByCollectionSlug = async (slug: string): Promise<ProductResponseDto[]> => {
+  try {
+    return await productModel.getByCollectionSlug(slug)
+  } catch (error) {
+    throw error
+  }
+}
+
 export const productService = {
   createNew,
   getProduct,
   update,
   getAll,
+  getByCollectionSlug,
   deleteProduct
 }

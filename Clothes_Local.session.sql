@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS categories (
     category_id SERIAL PRIMARY KEY,
     category_name VARCHAR(255) NOT NULL,
     category_slug VARCHAR(255) UNIQUE NOT NULL,
+    category_description TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP
 );
@@ -27,6 +28,9 @@ CREATE TABLE IF NOT EXISTS products (
     product_id SERIAL PRIMARY KEY,
     product_name VARCHAR(255) NOT NULL,
     product_slug VARCHAR(255) UNIQUE NOT NULL,
+    product_description TEXT,
+    is_featured BOOLEAN DEFAULT FALSE,
+    is_bestseller BOOLEAN DEFAULT FALSE,
     category_id INT NOT NULL REFERENCES categories (category_id) ON DELETE RESTRICT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP
@@ -126,4 +130,20 @@ CREATE TABLE IF NOT EXISTS cart_items (
     price DECIMAL(10, 2),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP
-)
+);
+
+CREATE TABLE IF NOT EXISTS collections (
+    collection_id SERIAL PRIMARY KEY,
+    collection_name VARCHAR(255) NOT NULL,
+    collection_slug VARCHAR(255) UNIQUE NOT NULL,
+    parent_collection_id INT REFERENCES collections (collection_id) ON DELETE SET NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS product_collections (
+    product_id INT NOT NULL REFERENCES products (product_id) ON DELETE CASCADE,
+    collection_id INT NOT NULL REFERENCES collections (collection_id) ON DELETE CASCADE,
+    PRIMARY KEY (product_id, collection_id)
+);

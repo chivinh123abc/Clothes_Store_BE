@@ -60,8 +60,30 @@ const updateCategory = async (category_id: number, reqBody: CategoryUpdateDto): 
   }
 }
 
+const getAll = async (): Promise<CategoryResponseDto[]> => {
+  try {
+    return await categoryModel.findAll()
+  } catch (error) {
+    throw error
+  }
+}
+
+const deleteCategory = async (category_id: number): Promise<boolean> => {
+  try {
+    const existCategory = await categoryModel.findCategoryById(category_id)
+    if (!existCategory) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'category not found')
+    }
+    return await categoryModel.deleteCategory(category_id)
+  } catch (error) {
+    throw error
+  }
+}
+
 export const categoryService = {
   createNew,
   getCategory,
-  updateCategory
+  updateCategory,
+  getAll,
+  deleteCategory
 }

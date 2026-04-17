@@ -178,7 +178,7 @@ const refreshToken = async (clientRefreshToken: string) => {
       env.ACCESS_TOKEN_LIFE
     )
 
-    return { accessToken }
+    return { access_token: accessToken }
   } catch (error) {
     throw (error)
   }

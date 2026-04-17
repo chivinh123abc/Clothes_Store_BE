@@ -7,8 +7,12 @@ const Router = express.Router()
 
 Router.route('/')
   .post(authMiddleware.isAuthorized, categoryValidation.createNew, categoryController.createNew)
-  .get(authMiddleware.isAuthorized, categoryController.getCategory)
+  .get(categoryController.getAll)
+
+Router.route('/:id')
+  .get(categoryController.getCategory)
   .put(authMiddleware.isAuthorized, categoryController.updateCategory)
+  .delete(authMiddleware.isAuthorized, categoryValidation.deleteCategory, categoryController.deleteCategory)
 
 
 export const categoryRoute = Router

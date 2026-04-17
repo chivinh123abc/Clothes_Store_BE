@@ -14,4 +14,6 @@ Router.route('/:id')
   .put(authMiddleware.isAuthorized, authMiddleware.isAdmin, productValidation.update, productController.update)
   .delete(authMiddleware.isAuthorized, authMiddleware.isAdmin, productController.deleteProduct)
 
+Router.get('/collection/:slug', productController.getByCollectionSlug)
+
 export const productRoute = Router
