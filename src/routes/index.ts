@@ -2,6 +2,8 @@ import express from 'express'
 import { cartItemRoute } from '../modules/cart_items/cart_item.route.js'
 import { cartRoute } from '../modules/carts/cart.route.js'
 import { categoryRoute } from '../modules/categories/category.route.js'
+import { collectionRoute } from '../modules/collections/collection.route.js'
+import { discountRoute } from '../modules/discounts/discount.route.js'
 import { orderItemRoute } from '../modules/order_items/order_item.route.js'
 import { orderRoute } from '../modules/orders/order.route.js'
 import { productConfigurationRoute } from '../modules/product_configurations/product_configurations.route.js'
@@ -18,6 +20,10 @@ Router.use('/user', userRoute)
 Router.use('/category', categoryRoute)
 
 Router.use('/product', productRoute)
+
+Router.use('/collection', collectionRoute)
+
+Router.use('/discount', discountRoute)
 
 Router.use('/product_item', productItemRoute)
 

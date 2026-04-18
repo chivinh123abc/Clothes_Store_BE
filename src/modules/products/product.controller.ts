@@ -50,10 +50,20 @@ const deleteProduct = async (req: Request, res: Response, next: NextFunction) =>
   }
 }
 
+const getByCollectionSlug = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const products = await productService.getByCollectionSlug(req.params.slug)
+    res.status(StatusCodes.OK).json(products)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const productController = {
   createNew,
   getProduct,
   update,
   getAll,
+  getByCollectionSlug,
   deleteProduct
 }

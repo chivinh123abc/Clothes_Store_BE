@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import ms from 'ms'
+import { env } from '../../configs/environment.js'
 import ApiError from '../../utils/ApiError.js'
 import { UserLoginDto } from '../types/user.js'
 import { userService } from './user.service.js'
@@ -59,18 +60,18 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const reqBody: UserLoginDto = req.body
     const loginedUser = await userService.login(reqBody)
 
-    res.cookie('accessToken', loginedUser.access_token, {
+    res.cookie('access_token', loginedUser.access_token, {
       httpOnly: true,
-      secure: true,
+      secure: false,//temp
       sameSite: 'none',
-      maxAge: ms('14 days')
+      maxAge: ms(env.ACCESS_TOKEN_LIFE as any) as unknown as number
     })
 
-    res.cookie('refreshToken', loginedUser.refresh_token, {
+    res.cookie('refresh_token', loginedUser.refresh_token, {
       httpOnly: true,
-      secure: true,
+      secure: false,//temp
       sameSite: 'none',
-      maxAge: ms('14 days')
+      maxAge: ms(env.REFRESH_TOKEN_LIFE as any) as unknown as number
     })
 
     res.status(StatusCodes.OK).json(loginedUser)
@@ -82,8 +83,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    res.clearCookie('accessToken')
-    res.clearCookie('refreshToken')
+    res.clearCookie('access_token')
+    res.clearCookie('refresh_token')
 
     res.status(StatusCodes.OK).json({ loggedout: true })
   } catch (error) {
@@ -94,13 +95,13 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
 const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    const result = await userService.refreshToken(req.cookies?.refreshToken)
+    const result = await userService.refreshToken(req.cookies?.refresh_token)
 
-    res.cookie('accessToken', result.accessToken, {
+    res.cookie('access_token', result.access_token, {
       httpOnly: true,
-      secure: true,
+      secure: false,//temp
       sameSite: 'none',
-      maxAge: ms('14 days')
+      maxAge: ms(env.ACCESS_TOKEN_LIFE as any) as unknown as number
     })
 
     res.status(StatusCodes.OK).json(result)

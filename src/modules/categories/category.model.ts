@@ -4,11 +4,11 @@ import { CategoryCreateDto, CategoryResponseDto, CategoryUpdateDto } from '../ty
 const create = async (reqBody: CategoryCreateDto): Promise<CategoryResponseDto> => {
   const result = await pool.query(
     `
-      INSERT INTO categories (category_name, category_slug)
-      VALUES ($1, $2)
-      RETURNING category_id, category_name, category_slug, created_at, updated_at
+      INSERT INTO categories (category_name, category_slug, category_description)
+      VALUES ($1, $2, $3)
+      RETURNING category_id, category_name, category_slug, category_description, created_at, updated_at
     `,
-    [reqBody.category_name, reqBody.category_slug]
+    [reqBody.category_name, reqBody.category_slug, reqBody.category_description || '']
   )
 
   return result.rows[0]
@@ -55,16 +55,38 @@ const update = async (category_id: number, reqBody: CategoryUpdateDto): Promise<
     UPDATE categories
     SET ${fields.join(', ')}
     WHERE category_id = $${updatedEntries.length + 1}
-    RETURNING category_id, category_name, category_slug, created_at, updated_at
+    RETURNING category_id, category_name, category_slug, category_description, created_at, updated_at
   `
 
   const result = await pool.query(queryData, values)
   return result.rows[0]
 }
 
+const findAll = async (): Promise<CategoryResponseDto[]> => {
+  const result = await pool.query(`
+    SELECT *
+    FROM categories
+    ORDER BY created_at ASC
+  `)
+  return result.rows
+}
+
+const deleteCategory = async (category_id: number): Promise<boolean> => {
+  const result = await pool.query(
+    `
+    DELETE FROM categories
+    WHERE category_id = $1
+    `,
+    [category_id]
+  )
+  return (result.rowCount ?? 0) > 0
+}
+
 export const categoryModel = {
   create,
   findCategoryById,
   findCategoryBySlugName,
-  update
+  update,
+  findAll,
+  deleteCategory
 }

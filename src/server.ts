@@ -30,7 +30,7 @@ const START_SERVER = () => {
   app.use('/api/v1', APIs)
   //Xu li loi
   app.use(errorHandlingMiddleware)
-  const PORT = Number(env.PORT) || 3000;
+  const PORT = Number(env.PORT) || 3000
   const HOST = env.HOST || '0.0.0.0'
   app.listen(PORT, HOST, () => {
     console.log(`[SERVER] Server running at http://${HOST}:${PORT}/`)
