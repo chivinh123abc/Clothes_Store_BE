@@ -127,8 +127,8 @@ DECLARE
     p_id INT;
 BEGIN
     -- 1. Essential Black Hoodie
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Essential Black Hoodie', 'essential-black-hoodie', 'A must-have for any wardrobe. This heavyweight cotton hoodie offers a relaxed fit and clean T1 branding on the chest.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'Essential Black Hoodie', 'essential-black-hoodie', 'A must-have for any wardrobe. This heavyweight cotton hoodie offers a relaxed fit and clean T1 branding on the chest.', category_id, TRUE
     FROM categories WHERE category_slug = 'hoodie' RETURNING product_id INTO p_id;
     
     INSERT INTO product_collections (product_id, collection_id)
@@ -139,7 +139,7 @@ BEGIN
 
     -- 2. Oversized White Shirt
     INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Oversized White Shirt', 'oversized-white-shirt', 'Crisp, clean, and perfectly oversized. This white shirt is designed with a modern silhouette and premium poplin fabric.', category_id 
+    SELECT 'Oversized White Shirt', 'oversized-white-shirt', 'Crisp, clean, and perfectly oversized. This white shirt is designed with a modern silhouette and premium poplin fabric.', category_id
     FROM categories WHERE category_slug = 'shirt' RETURNING product_id INTO p_id;
     
     INSERT INTO product_collections (product_id, collection_id)
@@ -149,8 +149,8 @@ BEGIN
     VALUES (p_id, 'OV-WH-SH-L', 0, 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=1080', 69.99);
 
     -- 3. Beige Cargo Pants
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Beige Cargo Pants', 'beige-cargo-pants', 'Functional meets fashion. Multiple pockets and a tapered fit make these cargo pants the ultimate streetwear essential.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'Beige Cargo Pants', 'beige-cargo-pants', 'Functional meets fashion. Multiple pockets and a tapered fit make these cargo pants the ultimate streetwear essential.', category_id, FALSE
     FROM categories WHERE category_slug = 'pants' RETURNING product_id INTO p_id;
     
     INSERT INTO product_collections (product_id, collection_id)
@@ -162,7 +162,7 @@ BEGIN
 
     -- 4. Premium Leather Jacket
     INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Premium Leather Jacket', 'premium-leather-jacket', 'Forged from top-grain leather, this jacket features custom T1 embossed hardware and a quilted satin lining.', category_id 
+    SELECT 'Premium Leather Jacket', 'premium-leather-jacket', 'Forged from top-grain leather, this jacket features custom T1 embossed hardware and a quilted satin lining.', category_id
     FROM categories WHERE category_slug = 'jacket' RETURNING product_id INTO p_id;
     
     INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
@@ -177,8 +177,8 @@ BEGIN
     VALUES (p_id, 'MI-GR-SW-M', 120, 'https://images.unsplash.com/photo-1578762560072-46ef14a5a7f9?auto=format&fit=crop&q=80&w=1080', 79.99);
 
     -- 6. Classic Denim Jacket
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Classic Denim Jacket', 'classic-denim-jacket', 'A timeless classic. Distressed details and a regular fit, perfect for any casual outfit.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'Classic Denim Jacket', 'classic-denim-jacket', 'A timeless classic. Distressed details and a regular fit, perfect for any casual outfit.', category_id, FALSE
     FROM categories WHERE category_slug = 'jacket' RETURNING product_id INTO p_id;
     
     INSERT INTO product_collections (product_id, collection_id)
@@ -189,8 +189,8 @@ BEGIN
     FROM discounts WHERE discount_percent = 23;
 
     -- 7. White Minimal Sneakers
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'White Minimal Sneakers', 'white-minimal-sneakers', 'Ultra-clean white sneakers with a vulcanized rubber sole and comfortable cushioned insole.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'White Minimal Sneakers', 'white-minimal-sneakers', 'Ultra-clean white sneakers with a vulcanized rubber sole and comfortable cushioned insole.', category_id, TRUE
     FROM categories WHERE category_slug = 'shoes' RETURNING product_id INTO p_id;
     
     INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
@@ -205,8 +205,8 @@ BEGIN
     VALUES (p_id, 'ST-CO-SE-M', 15, 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&q=80&w=1080', 189.99);
 
     -- 9. Urban Black Tee
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Urban Black Tee', 'urban-black-tee', 'Your fundamental black tee, upgraded with a dense luxury cotton and a silver-threaded logo.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'Urban Black Tee', 'urban-black-tee', 'Your fundamental black tee, upgraded with a dense luxury cotton and a silver-threaded logo.', category_id, TRUE
     FROM categories WHERE category_slug = 'tshirt' RETURNING product_id INTO p_id;
     
     INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
@@ -221,8 +221,8 @@ BEGIN
     VALUES (p_id, 'PR-WH-PO-M', 0, 'https://images.unsplash.com/photo-1576566588028-4147f342f27?auto=format&fit=crop&q=80&w=1080', 89.99);
 
     -- 11. Faker Unkillable Demon King Jacket
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'Faker Unkillable Demon King Jacket', 'faker-unkillable-demon-king-jacket', 'The official commemorative jacket for Lee "Faker" Sang-hyeok. Features embroidery inspired by his legendary plays.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'Faker Unkillable Demon King Jacket', 'faker-unkillable-demon-king-jacket', 'The official commemorative jacket for Lee "Faker" Sang-hyeok. Features embroidery inspired by his legendary plays.', category_id, TRUE
     FROM categories WHERE category_slug = 'jacket' RETURNING product_id INTO p_id;
     
     INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
@@ -237,8 +237,8 @@ BEGIN
     VALUES (p_id, 'T1-LO-SO-ONE', 500, 'https://images.unsplash.com/photo-1582966772680-860e372bb558?auto=format&fit=crop&q=80&w=1080', 24.99);
 
     -- 13. T1 Official Team Jersey 2024
-    INSERT INTO products (product_name, product_slug, product_description, category_id)
-    SELECT 'T1 Official Team Jersey 2024', 't1-official-team-jersey-2024', 'The exact jersey worn by Faker and the team during the 2024 Season. Lightweight and aerodynamic.', category_id 
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'T1 Official Team Jersey 2024', 't1-official-team-jersey-2024', 'The exact jersey worn by Faker and the team during the 2024 Season. Lightweight and aerodynamic.', category_id, TRUE
     FROM categories WHERE category_slug = 'tshirt' RETURNING product_id INTO p_id;
     
     INSERT INTO product_collections (product_id, collection_id)
@@ -246,6 +246,46 @@ BEGIN
     
     INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
     VALUES (p_id, 'T1-JE-24-M', 800, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=1080', 110.00);
+
+    -- 14. T1 Champion Gold T-Shirt
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'T1 Champion Gold T-Shirt', 't1-champion-gold-tshirt', 'Celebrate the victory with this limited edition gold-trimmed T-Shirt.', category_id, FALSE
+    FROM categories WHERE category_slug = 'tshirt' RETURNING product_id INTO p_id;
+    
+    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
+    VALUES (p_id, 'T1-CH-GO-L', 150, 'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?auto=format&fit=crop&q=80&w=1080', 45.00);
+
+    -- 15. Faker Signature Red Hoodie
+    INSERT INTO products (product_name, product_slug, product_description, category_id, is_bestseller)
+    SELECT 'Faker Signature Red Hoodie', 'faker-signature-red-hoodie', 'Official signature hoodie of the Unkillable Demon King in iconic T1 Red.', category_id, TRUE
+    FROM categories WHERE category_slug = 'hoodie' RETURNING product_id INTO p_id;
+    
+    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
+    VALUES (p_id, 'FA-SI-RE-M', 200, 'https://images.unsplash.com/photo-1556821840-ecc63f93428c?auto=format&fit=crop&q=80&w=1080', 95.00);
+
+    -- 16. T1 Pro Player Joggers
+    INSERT INTO products (product_name, product_slug, product_description, category_id)
+    SELECT 'T1 Pro Player Joggers', 't1-pro-player-joggers', 'High-performance joggers designed for comfort during long gaming sessions.', category_id 
+    FROM categories WHERE category_slug = 'pants' RETURNING product_id INTO p_id;
+    
+    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
+    VALUES (p_id, 'T1-PR-JO-L', 120, 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&q=80&w=1080', 75.00);
+
+    -- 17. T1 Stealth Black Cap
+    INSERT INTO products (product_name, product_slug, product_description, category_id)
+    SELECT 'T1 Stealth Black Cap', 't1-stealth-black-cap', 'Minimalist black cap with a subtle T1 logo embroidery.', category_id 
+    FROM categories WHERE category_slug = 'hat' RETURNING product_id INTO p_id;
+    
+    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
+    VALUES (p_id, 'T1-ST-BL-ONE', 300, 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&q=80&w=1080', 35.00);
+
+    -- 18. T1 Elite Gaming Jersey
+    INSERT INTO products (product_name, product_slug, product_description, category_id)
+    SELECT 'T1 Elite Gaming Jersey', 't1-elite-gaming-jersey', 'The ultimate jersey for competitive play. Moisture-wicking and ultra-light.', category_id
+    FROM categories WHERE category_slug = 'tshirt' RETURNING product_id INTO p_id;
+    
+    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
+    VALUES (p_id, 'T1-EL-GA-M', 500, 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=1080', 120.00);
 
 END $$;
 

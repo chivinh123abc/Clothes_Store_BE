@@ -10,7 +10,9 @@ export const createNew = async (req: Request, res: Response, next: NextFunction)
     }),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    phone_number: Joi.string().pattern(/^[0-9]+$/).optional(),
+    phone_number: Joi.string().pattern(/^[0-9\s]+$/).optional().messages({
+      'string.pattern.base': 'Phone number can only contain digits and spaces.'
+    }),
     avatar: Joi.string().uri().optional()
   })
 
@@ -37,7 +39,9 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
     }),
     email: Joi.string().email().optional(),
     password: Joi.string().min(6).optional(),
-    phone_number: Joi.string().pattern(/^[0-9]+$/).optional(),
+    phone_number: Joi.string().pattern(/^[0-9\s]+$/).optional().messages({
+      'string.pattern.base': 'Phone number can only contain digits and spaces.'
+    }),
     avatar: Joi.string().uri().optional()
   }).min(1)
 
