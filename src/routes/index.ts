@@ -9,6 +9,7 @@ import { orderRoute } from '../modules/orders/order.route.js'
 import { productConfigurationRoute } from '../modules/product_configurations/product_configurations.route.js'
 import { productItemRoute } from '../modules/product_items/product_item.route.js'
 import { productRoute } from '../modules/products/product.route.js'
+import { adminUserRoute } from '../modules/users/admin_user.route.js'
 import { userRoute } from '../modules/users/user.route.js'
 import { variantOptionRoute } from '../modules/variant_options/variant_option.route.js'
 import { variantRoute } from '../modules/variants/variant.route.js'
@@ -16,6 +17,7 @@ import { variantRoute } from '../modules/variants/variant.route.js'
 const Router = express.Router()
 
 Router.use('/user', userRoute)
+Router.use('/admin/users', adminUserRoute)
 
 Router.use('/category', categoryRoute)
 

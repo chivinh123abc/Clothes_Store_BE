@@ -120,6 +120,58 @@ const verifyAccount = async (req: Request, res: Response, next: NextFunction) =>
   }
 }
 
+const findAll = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('[DEBUG] Admin findAll hit')
+    const users = await userService.findAll()
+    res.status(StatusCodes.OK).json(users)
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[DEBUG] Admin findAll error:', error)
+    next(error)
+  }
+}
+
+const adminUpdate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+    const result = await userService.adminUpdate(Number(id), req.body)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const adminDelete = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+    const result = await userService.adminDelete(Number(id))
+    res.status(StatusCodes.OK).json({ success: result })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const adminCreate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await userService.adminCreate(req.body)
+    res.status(StatusCodes.CREATED).json(user)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const resendVerification = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body
+    const result = await userService.resendVerification(email)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const userController = {
   createNew,
   getUser,
@@ -128,5 +180,10 @@ export const userController = {
   login,
   refreshToken,
   logout,
-  verifyAccount
+  verifyAccount,
+  findAll,
+  adminUpdate,
+  adminDelete,
+  adminCreate,
+  resendVerification
 }

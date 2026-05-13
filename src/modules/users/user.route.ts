@@ -13,7 +13,8 @@ Router.route('/delete').delete(authMiddleware.isAuthorized, userController.softD
 
 Router.route('/update').put(authMiddleware.isAuthorized, userValidation.update, userController.update)
 
-Router.route('/verify').put(userValidation.verifyAccount, userController.verifyAccount)
+Router.route('/verify-account').post(userValidation.verifyAccount, userController.verifyAccount)
+Router.route('/resend-verification').post(userController.resendVerification)
 
 Router.route('/login').post(userValidation.login, userController.login)
 

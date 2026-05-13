@@ -17,5 +17,11 @@ export const env = {
   ACCESS_TOKEN_SECRET_SIGNATURE: process.env.ACCESS_TOKEN_SECRET_SIGNATURE as string,
   ACCESS_TOKEN_LIFE: process.env.ACCESS_TOKEN_LIFE as StringValue | number,
   REFRESH_TOKEN_SECRET_SIGNATURE: process.env.REFRESH_TOKEN_SECRET_SIGNATURE as string,
-  REFRESH_TOKEN_LIFE: process.env.REFRESH_TOKEN_LIFE as StringValue | number
+  REFRESH_TOKEN_LIFE: process.env.REFRESH_TOKEN_LIFE as StringValue | number,
+
+  MAIL_HOST: process.env.MAIL_HOST as string,
+  MAIL_PORT: process.env.MAIL_PORT as string,
+  MAIL_USER: process.env.MAIL_USER as string,
+  MAIL_PASSWORD: process.env.MAIL_PASSWORD as string,
+  MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS as string
 }

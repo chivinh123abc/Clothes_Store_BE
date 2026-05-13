@@ -6,7 +6,8 @@ const generateTokens = async (userInfo: UserEntity, secretSignature: string, tok
   try {
     const generateUser = {
       user_id: userInfo.user_id,
-      email: userInfo.email
+      email: userInfo.email,
+      role: userInfo.role
     }
 
     const options: SignOptions = {

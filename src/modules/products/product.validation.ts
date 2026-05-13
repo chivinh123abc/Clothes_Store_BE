@@ -6,7 +6,13 @@ import ApiError from '../../utils/ApiError.js'
 const createNew = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
     product_name: Joi.string().min(4).max(255).required(),
-    category_id: Joi.number().integer().min(1).required()
+    category_id: Joi.number().integer().min(1).required(),
+    product_slug: Joi.string().optional(),
+    product_description: Joi.string().optional(),
+    is_featured: Joi.boolean().optional(),
+    is_bestseller: Joi.boolean().optional(),
+    collection_ids: Joi.array().items(Joi.number().integer()).optional(),
+    items: Joi.array().optional()
   })
 
   try {
@@ -29,7 +35,13 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
   const correctCondition = Joi.object({
     product_id: Joi.number().integer().min(1).required(),
     product_name: Joi.string().min(4).max(255).optional(),
-    category_id: Joi.number().integer().min(1).optional()
+    category_id: Joi.number().integer().min(1).optional(),
+    product_slug: Joi.string().optional(),
+    product_description: Joi.string().optional(),
+    is_featured: Joi.boolean().optional(),
+    is_bestseller: Joi.boolean().optional(),
+    collection_ids: Joi.array().items(Joi.number().integer()).optional(),
+    items: Joi.array().optional()
   }).min(1)
 
   try {

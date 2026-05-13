@@ -31,7 +31,7 @@ const findProductById = async (product_id: number): Promise<ProductResponseDto |
             CASE 
               WHEN disc.discount_percent IS NOT NULL 
               THEN pi.product_item_price * (1 - disc.discount_percent::float/100)
-              ELSE pi.product_item_price
+              ELSE NULL
             END as sale_price
           FROM product_items pi
           LEFT JOIN product_configurations conf ON pi.product_item_id = conf.product_item_id
@@ -73,7 +73,7 @@ const findProductBySlug = async (product_slug: string): Promise<ProductResponseD
             CASE 
               WHEN disc.discount_percent IS NOT NULL 
               THEN pi.product_item_price * (1 - disc.discount_percent::float/100)
-              ELSE pi.product_item_price
+              ELSE NULL
             END as sale_price
           FROM product_items pi
           LEFT JOIN product_configurations conf ON pi.product_item_id = conf.product_item_id
@@ -135,7 +135,7 @@ const findAll = async (): Promise<ProductResponseDto[]> => {
             CASE 
               WHEN disc.discount_percent IS NOT NULL 
               THEN pi.product_item_price * (1 - disc.discount_percent::float/100)
-              ELSE pi.product_item_price
+              ELSE NULL
             END as sale_price
           FROM product_items pi
           LEFT JOIN product_configurations conf ON pi.product_item_id = conf.product_item_id
@@ -182,7 +182,7 @@ const getByCollectionSlug = async (slug: string): Promise<ProductResponseDto[]> 
               CASE 
                 WHEN disc.discount_percent IS NOT NULL 
                 THEN pi.product_item_price * (1 - disc.discount_percent::float/100)
-                ELSE pi.product_item_price
+                ELSE NULL
               END as sale_price
             FROM product_items pi
             LEFT JOIN product_configurations conf ON pi.product_item_id = conf.product_item_id
