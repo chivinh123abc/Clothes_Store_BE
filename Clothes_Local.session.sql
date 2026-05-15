@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP,
     verify_token VARCHAR(255),
     is_active BOOLEAN DEFAULT false,
-    is_destroy BOOLEAN DEFAULT false
+    is_destroy BOOLEAN DEFAULT false,
+    address TEXT
 );
 
 CREATE TABLE IF NOT EXISTS categories (

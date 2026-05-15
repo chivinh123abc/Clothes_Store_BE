@@ -27,9 +27,28 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 
 const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const order_id = req.body.order_id
-    const gotOrder = await orderService.getOrder(order_id)
-    res.status(StatusCodes.ACCEPTED).json(gotOrder)
+    const { id } = req.params
+    const gotOrder = await orderService.getOrder(Number(id))
+    res.status(StatusCodes.OK).json(gotOrder)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orders = await orderService.getAllOrders()
+    res.status(StatusCodes.OK).json(orders)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const deleteOrder = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params
+    await orderService.deleteOrder(Number(id))
+    res.status(StatusCodes.NO_CONTENT).send()
   } catch (error) {
     next(error)
   }
@@ -38,5 +57,7 @@ const getOrderById = async (req: Request, res: Response, next: NextFunction) => 
 export const orderController = {
   createNew,
   update,
-  getOrderById
+  getOrderById,
+  getAllOrders,
+  deleteOrder
 }

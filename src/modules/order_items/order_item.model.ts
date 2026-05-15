@@ -47,8 +47,20 @@ const update = async (reqBody: OrderItemUpdateDto): Promise<OrderItemResponseDto
   return result.rows[0] || null
 }
 
+const findAllByOrderId = async (order_id: number): Promise<any[]> => {
+  const result = await pool.query(`
+    SELECT oi.*, pi.product_item_image as image, p.product_name as name, pi.product_item_price as price
+    FROM order_items oi
+    JOIN product_items pi ON oi.product_item_id = pi.product_item_id
+    JOIN products p ON pi.product_id = p.product_id
+    WHERE oi.order_id = $1
+  `, [order_id])
+  return result.rows
+}
+
 export const orderItemModel = {
   create,
   getOrderItemById,
-  update
+  update,
+  findAllByOrderId
 }

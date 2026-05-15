@@ -43,13 +43,41 @@ const update = async (reqBody: OrderUpdateDto): Promise<OrderResponseDto> => {
   }
 }
 
-const getOrder = async (order_id: number): Promise<OrderResponseDto> => {
+import { orderItemModel } from '../order_items/order_item.model.js'
+
+const getOrder = async (order_id: number): Promise<any> => {
   try {
     const existOrder = await orderModel.findOrderById(order_id)
     if (!existOrder) {
       throw (new ApiError(StatusCodes.NOT_FOUND, 'Order not found'))
     }
-    return existOrder
+    
+    const items = await orderItemModel.findAllByOrderId(order_id)
+    
+    return {
+      ...existOrder,
+      items
+    }
+  } catch (error) {
+    throw error
+  }
+}
+
+const getAllOrders = async (): Promise<OrderResponseDto[]> => {
+  try {
+    return await orderModel.findAllOrders()
+  } catch (error) {
+    throw error
+  }
+}
+
+const deleteOrder = async (order_id: number): Promise<void> => {
+  try {
+    const existOrder = await orderModel.findOrderById(order_id)
+    if (!existOrder) {
+      throw (new ApiError(StatusCodes.NOT_FOUND, 'Order not found'))
+    }
+    await orderModel.deleteOrder(order_id)
   } catch (error) {
     throw error
   }
@@ -58,5 +86,7 @@ const getOrder = async (order_id: number): Promise<OrderResponseDto> => {
 export const orderService = {
   createNew,
   update,
-  getOrder
+  getOrder,
+  getAllOrders,
+  deleteOrder
 }

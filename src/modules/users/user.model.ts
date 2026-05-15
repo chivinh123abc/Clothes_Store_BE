@@ -16,7 +16,7 @@ const create = async (reqBody: any): Promise<UserResponseDto> => {
   const query = `
     INSERT INTO users (${columns.join(', ')})
     VALUES (${placeholders.join(', ')})
-    RETURNING user_id, username, email, phone_number, role, avatar, created_at, updated_at, is_active
+    RETURNING user_id, username, email, phone_number, role, status, avatar, created_at, updated_at, is_active, address, display_name, full_name
   `
   const result = await pool.query(query, values)
   return result.rows[0]
@@ -26,7 +26,7 @@ const create = async (reqBody: any): Promise<UserResponseDto> => {
 const findUserByEmail = async (email: string): Promise<UserEntity | null> => {
   const result = await pool.query(
     `
-      SELECT user_id, username, password, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy, verify_token
+      SELECT user_id, username, password, email, phone_number, role, status, avatar, created_at, updated_at, is_active, is_destroy, verify_token, address, display_name, full_name
       FROM users
       WHERE email = $1 AND is_destroy = false
     `, [email]
@@ -37,7 +37,7 @@ const findUserByEmail = async (email: string): Promise<UserEntity | null> => {
 const findUserByIdentifier = async (identifier: string): Promise<UserEntity | null> => {
   const result = await pool.query(
     `
-      SELECT user_id, username, password, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy, verify_token
+      SELECT user_id, username, password, email, phone_number, role, status, avatar, created_at, updated_at, is_active, is_destroy, verify_token, address, display_name, full_name
       FROM users
       WHERE (email = $1 OR username = $1) AND is_destroy = false
     `, [identifier]
@@ -49,7 +49,7 @@ const findUserByIdentifier = async (identifier: string): Promise<UserEntity | nu
 const findUserById = async (user_id: number): Promise<UserEntity | null> => {
   const result = await pool.query(
     `
-      SELECT user_id, username, password, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy, verify_token
+      SELECT user_id, username, password, email, phone_number, role, status, avatar, created_at, updated_at, is_active, is_destroy, verify_token, address, display_name, full_name
       FROM users
       WHERE user_id = $1 AND is_destroy = false
     `,
@@ -75,7 +75,7 @@ const update = async (user_id: number, reqBody: UserUpdateDto): Promise<UserResp
     UPDATE users
     SET ${fields.join(', ')}
     WHERE user_id = $${updatedEntries.length + 1}
-    RETURNING user_id, username, email, phone_number, avatar, created_at, updated_at, is_destroy, is_active, verify_token
+    RETURNING user_id, username, email, phone_number, avatar, created_at, updated_at, is_destroy, is_active, status, verify_token, address, display_name, full_name
     `
   const result = await pool.query(queryData, values)
   return result.rows[0] || null
@@ -97,7 +97,7 @@ const softDelete = async (user_id: number): Promise<UserResponseDto> => {
 const findAll = async (): Promise<UserResponseDto[]> => {
   const result = await pool.query(
     `
-    SELECT user_id, username, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy, verify_token
+    SELECT user_id, username, email, phone_number, role, avatar, created_at, updated_at, is_active, is_destroy, status, verify_token, address, display_name, full_name
     FROM users
     ORDER BY created_at DESC
     `

@@ -19,11 +19,12 @@ const create = async (reqBody: OrderCreateDto): Promise<OrderResponseDto> => {
   return result.rows[0]
 }
 
-const findOrderById = async (order_id: number): Promise<OrderResponseDto | null> => {
+const findOrderById = async (order_id: number): Promise<any | null> => {
   const result = await pool.query(`
-      SELECT *
-      FROM orders
-      WHERE order_id = $1
+      SELECT o.*, u.username as user_name, u.email as user_email, u.full_name, u.address as user_address, u.phone_number as user_phone
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.user_id
+      WHERE o.order_id = $1
     `, [order_id])
   return result.rows[0] || null
 }
@@ -62,9 +63,28 @@ const update = async (reqBody: OrderUpdateDto): Promise<OrderResponseDto | null>
   return result.rows[0]
 }
 
+const findAllOrders = async (): Promise<OrderResponseDto[]> => {
+  const result = await pool.query(`
+      SELECT o.*, u.username as user_name, u.email as user_email
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.user_id
+      ORDER BY o.created_at DESC
+    `)
+  return result.rows
+}
+
+const deleteOrder = async (order_id: number): Promise<void> => {
+  await pool.query(`
+    DELETE FROM orders
+    WHERE order_id = $1
+  `, [order_id])
+}
+
 export const orderModel = {
   create,
   update,
   findOrderById,
-  findAllOrderByUserId
+  findAllOrderByUserId,
+  findAllOrders,
+  deleteOrder
 }

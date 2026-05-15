@@ -4,6 +4,8 @@ export interface OrderCreateDto {
   user_id: number,
   status: OrderStatus,
   total_amount: number,
+  payment_method: string,
+  payment_status: string,
   comment?: string
 }
 
@@ -12,6 +14,8 @@ export interface OrderUpdateDto {
   user_id?: number,
   status?: OrderStatus,
   total_amount?: number,
+  payment_method?: string,
+  payment_status?: string,
   comment?: string
 }
 
@@ -20,6 +24,8 @@ export interface OrderResponseDto {
   user_id?: number,
   status?: OrderStatus,
   total_amount?: number,
+  payment_method?: string,
+  payment_status?: string,
   comment?: string,
   created_at?: Date,
   updated_at?: Date

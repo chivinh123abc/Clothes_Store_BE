@@ -19,7 +19,7 @@ export const slugify = (value: string) => {
 export const pickUser = (user: UserEntity): UserResponseDto | null => {
   if (!user) return null
 
-  return _.pick(user, [
+  const result = _.pick(user, [
     'user_id',
     'email',
     'username',
@@ -29,8 +29,29 @@ export const pickUser = (user: UserEntity): UserResponseDto | null => {
     'is_active',
     'created_at',
     'updated_at',
-    'is_destroy'
+    'is_destroy',
+    'address',
+    'display_name',
+    'full_name'
   ]) as UserResponseDto
+
+  // Calculate status from the numeric 'status' column
+  if (user.status === 0) {
+    result.status = 0
+  } else if (user.status === 1) {
+    result.status = 1
+  } else if (user.status === 2) {
+    result.status = 2
+  } else if (user.is_active) {
+    // Fallback to old logic
+    result.status = 0
+  } else if (user.verify_token) {
+    result.status = 2
+  } else {
+    result.status = 1
+  }
+
+  return result
 }
 
 export const generateSKUwithSlug = (slug: string, charsFromFirstWord = 2) => {

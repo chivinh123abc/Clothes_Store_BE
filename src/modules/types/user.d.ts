@@ -25,7 +25,11 @@ export interface UserUpdateDto {
   phone_number?: string,
   avatar?: string,
   verify_token?: string | null,
-  is_active?: boolean
+  is_active?: boolean,
+  status?: number,
+  address?: string,
+  display_name?: string,
+  full_name?: string
 }
 
 export interface UserResponseDto {
@@ -39,6 +43,10 @@ export interface UserResponseDto {
   created_at?: Date
   updated_at?: Date,
   is_destroy?: boolean,
+  status?: number,
+  address?: string,
+  display_name?: string,
+  full_name?: string
 }
 
 export interface AuthResponseDto extends UserResponseDto {
@@ -58,8 +66,12 @@ export interface UserEntity {
   is_destroy?: boolean
   is_active?: boolean
   role?: number
+  status?: number
   verify_token?: string
   access_token?: string,
-  refresh_token?: string
+  refresh_token?: string,
+  address?: string,
+  display_name?: string,
+  full_name?: string
 }
 

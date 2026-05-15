@@ -35,11 +35,11 @@ const createNew = async (reqBody: UserRegisterDto): Promise<UserResponseDto> => 
           phone_number: reqBody.phone_number?.replace(/\s/g, ''),
           avatar: reqBody.avatar
         }
-        await userModel.update(existUser.user_id!, updateData)
+        await userModel.update(existUser.user_id!, { ...updateData, status: 2 })
         await MailProvider.sendVerificationEmail(reqBody.email, reqBody.username, newToken)
         
         return { 
-          ...pickUser(existUser), 
+          ...pickUser({ ...existUser, ...updateData, status: 2 } as UserEntity), 
           message: 'Account exists but was not activated. Information updated and new verification email sent.' 
         } as any
       }
@@ -52,7 +52,8 @@ const createNew = async (reqBody: UserRegisterDto): Promise<UserResponseDto> => 
       phone_number: reqBody.phone_number?.replace(/\s/g, ''),
       avatar: reqBody.avatar,
       password: bcrypt.hashSync(reqBody.password, 8),
-      verify_token: uuidv7()
+      verify_token: uuidv7(),
+      status: 2
     }
 
     const createdUser = await userModel.create(newUser)
@@ -74,18 +75,30 @@ const adminCreate = async (reqBody: any): Promise<UserResponseDto> => {
       throw new ApiError(StatusCodes.CONFLICT, 'Email already exists')
     }
 
-    const newUser = {
+    const newUser: any = {
       username: reqBody.username,
       email: reqBody.email,
-      password: bcrypt.hashSync(reqBody.password || 'ClotheStore@15082005', 8), // Default password if not provided
+      password: bcrypt.hashSync(reqBody.password || 'ClotheStore@15082005', 8),
       phone_number: reqBody.phone_number?.replace(/\s/g, ''),
       avatar: reqBody.avatar,
       role: reqBody.role || 0,
-      is_active: reqBody.is_active !== undefined ? reqBody.is_active : true,
-      verify_token: null // Admin created accounts are pre-verified
+      status: reqBody.status !== undefined ? Number(reqBody.status) : 0
     }
 
-    return await userModel.create(newUser)
+    // Set internal flags based on status
+    if (newUser.status === 0) {
+      newUser.is_active = true
+      newUser.verify_token = null
+    } else if (newUser.status === 2) {
+      newUser.is_active = false
+      newUser.verify_token = uuidv7()
+    } else {
+      newUser.is_active = false
+      newUser.verify_token = null
+    }
+
+    const createdUser = await userModel.create(newUser)
+    return pickUser(createdUser as UserEntity) as UserResponseDto
   } catch (error) {
     throw error
   }
@@ -106,26 +119,33 @@ const getUser = async (reqBody: { user_id: number }): Promise<UserEntity> => {
 }
 
 const update = async (user_id: number, reqBody: UserUpdateDto): Promise<UserResponseDto | null> => {
-
   try {
     const existUser = await userModel.findUserById(user_id)
-
     if (!existUser) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User is not exist')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User does not exist')
     }
 
-    const updateData = {
+    const updateData: any = {
       username: reqBody.username,
       email: reqBody.email,
       phone_number: reqBody.phone_number?.replace(/\s/g, ''),
-      avatar: reqBody.avatar
+      avatar: reqBody.avatar,
+      address: reqBody.address,
+      display_name: reqBody.display_name,
+      full_name: reqBody.full_name
     }
 
-    const updatedUser = await userModel.update(user_id, updateData)
+    if (reqBody.password) {
+      updateData.password = bcrypt.hashSync(reqBody.password, 8)
+    }
 
-    return updatedUser
+    // Filter out undefined values
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key])
+
+    const updatedUser = await userModel.update(user_id, updateData)
+    return pickUser(updatedUser as UserEntity)
   } catch (error) {
-    throw (error)
+    throw error
   }
 }
 
@@ -193,7 +213,8 @@ const verifyAccount = async (reqBody: UserVerifyAccountDTO) => {
 
     const verifiedData: UserUpdateDto = {
       verify_token: null,
-      is_active: true
+      is_active: true,
+      status: 0
     }
 
     const existUserId = existUser.user_id as number
@@ -232,7 +253,8 @@ const refreshToken = async (clientRefreshToken: string) => {
 
 const findAll = async () => {
   try {
-    return await userModel.findAll()
+    const users = await userModel.findAll()
+    return users.map(user => pickUser(user as UserEntity))
   } catch (error) {
     throw error
   }
@@ -248,7 +270,24 @@ const adminUpdate = async (user_id: number, reqBody: any) => {
     if (updateData.phone_number) {
       updateData.phone_number = updateData.phone_number.replace(/\s/g, '')
     }
-    return await userModel.update(user_id, updateData)
+
+    // Handle status changes internally
+    if (updateData.status !== undefined) {
+      const statusNum = Number(updateData.status)
+      if (statusNum === 0) {
+        updateData.is_active = true
+        updateData.verify_token = null
+      } else if (statusNum === 2) {
+        updateData.is_active = false
+        if (!existUser.verify_token) updateData.verify_token = uuidv7()
+      } else {
+        updateData.is_active = false
+        updateData.verify_token = null
+      }
+    }
+
+    const updatedUser = await userModel.update(user_id, updateData)
+    return pickUser(updatedUser as UserEntity) as UserResponseDto
   } catch (error) {
     throw error
   }
