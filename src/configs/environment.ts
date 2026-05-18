@@ -26,5 +26,11 @@ export const env = {
   MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS as string,
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
+
+  // MOMO
+  MOMO_PARTNER_CODE: process.env.MOMO_PARTNER_CODE as string,
+  MOMO_ACCESS_KEY: process.env.MOMO_ACCESS_KEY as string,
+  MOMO_SECRET_KEY: process.env.MOMO_SECRET_KEY as string,
+  MOMO_ENDPOINT: process.env.MOMO_ENDPOINT as string
 }

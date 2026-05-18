@@ -49,10 +49,46 @@ const update = async (reqBody: OrderItemUpdateDto): Promise<OrderItemResponseDto
 
 const findAllByOrderId = async (order_id: number): Promise<any[]> => {
   const result = await pool.query(`
-    SELECT oi.*, pi.product_item_image as image, p.product_name as name, pi.product_item_price as price
+    SELECT 
+      oi.*, 
+      pi.product_item_image as image, 
+      pi.product_item_image as product_item_image,
+      p.product_name as name, 
+      p.product_name as product_name,
+      COALESCE(
+        CASE 
+          WHEN d.active = true AND d.discount_percent IS NOT NULL 
+          THEN pi.product_item_price * (1 - d.discount_percent::float/100)
+          ELSE NULL
+        END,
+        oi.unit_price,
+        pi.product_item_price
+      ) as unit_price,
+      COALESCE(
+        CASE 
+          WHEN d.active = true AND d.discount_percent IS NOT NULL 
+          THEN pi.product_item_price * (1 - d.discount_percent::float/100)
+          ELSE NULL
+        END,
+        oi.unit_price,
+        pi.product_item_price
+      ) as price,
+      COALESCE(
+        CASE 
+          WHEN d.active = true AND d.discount_percent IS NOT NULL 
+          THEN pi.product_item_price * (1 - d.discount_percent::float/100)
+          ELSE NULL
+        END,
+        oi.unit_price,
+        pi.product_item_price
+      ) as product_item_price,
+      vo.variant_option_value as size
     FROM order_items oi
     JOIN product_items pi ON oi.product_item_id = pi.product_item_id
     JOIN products p ON pi.product_id = p.product_id
+    LEFT JOIN discounts d ON pi.discount_id = d.discount_id
+    LEFT JOIN product_configurations pc ON pi.product_item_id = pc.product_item_id
+    LEFT JOIN variant_options vo ON pc.variant_option_id = vo.variant_option_id
     WHERE oi.order_id = $1
   `, [order_id])
   return result.rows

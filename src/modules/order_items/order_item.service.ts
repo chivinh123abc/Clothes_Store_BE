@@ -18,7 +18,7 @@ const createNew = async (reqBody: OrderItemCreateDto): Promise<OrderItemResponse
       throw (new ApiError(StatusCodes.NOT_FOUND, 'Product_item not exist'))
     }
 
-    reqBody.unit_price = Number(existProductItem.product_item_price)
+    reqBody.unit_price = Number(existProductItem.sale_price !== undefined && existProductItem.sale_price !== null ? existProductItem.sale_price : existProductItem.product_item_price)
 
     const result = await orderItemModel.create(reqBody)
     return result

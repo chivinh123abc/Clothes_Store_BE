@@ -1,0 +1,4 @@
+Error: Failed to create MoMo payment link: Yêu cầu bị từ chối vì số tiền giao dịch nhỏ hơn số tiền tối thiểu cho phép là 1000 VND hoặc lớn hơn số tiền tối đa cho phép là 50000000 VND.
+    at createMoMoPaymentUrl (D:\0 Mon hoc\LapTrinhUngDung\Clothes_Store_BE\src\modules\payment\payment.service.ts:53:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async createMoMo (D:\0 Mon hoc\LapTrinhUngDung\Clothes_Store_BE\src\modules\payment\payment.controller.ts:15:20)

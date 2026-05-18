@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import ApiError from '../../utils/ApiError.js'
 import { orderService } from './order.service.js'
 
 const createNew = async (req: Request, res: Response, next: NextFunction) => {
@@ -54,10 +55,45 @@ const deleteOrder = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
+const getOrdersByUserId = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params
+    
+    // Security: Only allow the logged-in user to see their own orders, or Admin to see anyone's orders
+    if (req.jwtDecoded?.user_id !== Number(userId) && req.jwtDecoded?.role !== 1) {
+      throw new ApiError(StatusCodes.FORBIDDEN, 'Forbidden (You can only access your own orders)')
+    }
+
+    const orders = await orderService.getOrdersByUserId(Number(userId))
+    res.status(StatusCodes.OK).json(orders)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { orderId } = req.params
+    const userId = req.jwtDecoded?.user_id
+    const isAdmin = req.jwtDecoded?.role === 1
+
+    if (!userId) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized')
+    }
+
+    const updatedOrder = await orderService.cancelOrder(Number(orderId), userId, isAdmin)
+    res.status(StatusCodes.OK).json(updatedOrder)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const orderController = {
   createNew,
   update,
   getOrderById,
   getAllOrders,
-  deleteOrder
+  deleteOrder,
+  getOrdersByUserId,
+  cancelOrder
 }

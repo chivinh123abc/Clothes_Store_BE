@@ -1,5 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
+import { OrderStatus } from '../constants/orders.enum.js'
+import { orderItemModel } from '../order_items/order_item.model.js'
 import { OrderCreateDto, OrderResponseDto, OrderUpdateDto } from '../types/orders.js'
 import { userModel } from '../users/user.model.js'
 import { orderModel } from './order.model.js'
@@ -43,7 +45,7 @@ const update = async (reqBody: OrderUpdateDto): Promise<OrderResponseDto> => {
   }
 }
 
-import { orderItemModel } from '../order_items/order_item.model.js'
+
 
 const getOrder = async (order_id: number): Promise<any> => {
   try {
@@ -83,10 +85,62 @@ const deleteOrder = async (order_id: number): Promise<void> => {
   }
 }
 
+const getOrdersByUserId = async (user_id: number): Promise<any[]> => {
+  try {
+    const orders = await orderModel.findAllOrderByUserId(user_id)
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const items = await orderItemModel.findAllByOrderId(order.order_id!)
+        return {
+          ...order,
+          items
+        }
+      })
+    )
+    return ordersWithItems
+  } catch (error) {
+    throw error
+  }
+}
+
+const cancelOrder = async (order_id: number, user_id: number, isAdmin: boolean): Promise<OrderResponseDto> => {
+  try {
+    const order = await orderModel.findOrderById(order_id)
+    if (!order) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Order not found')
+    }
+
+    // Security: Must be owner or admin
+    if (order.user_id !== user_id && !isAdmin) {
+      throw new ApiError(StatusCodes.FORBIDDEN, 'Forbidden (You can only cancel your own orders)')
+    }
+
+    // Business Logic: Can only cancel if still pending
+    if (order.status !== 'pending') {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Only pending orders can be cancelled')
+    }
+
+    const updatedOrder = await orderModel.update({
+      order_id,
+      status: OrderStatus.CANCELLED
+    })
+
+    if (!updatedOrder) {
+      throw new ApiError(StatusCodes.CONFLICT, 'Cancel order failed')
+    }
+
+    return updatedOrder!
+  } catch (error) {
+    throw error
+  }
+}
+
 export const orderService = {
   createNew,
   update,
   getOrder,
   getAllOrders,
-  deleteOrder
+  deleteOrder,
+  getOrdersByUserId,
+  cancelOrder
 }

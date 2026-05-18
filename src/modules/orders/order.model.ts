@@ -29,13 +29,14 @@ const findOrderById = async (order_id: number): Promise<any | null> => {
   return result.rows[0] || null
 }
 
-const findAllOrderByUserId = async (user_id: number): Promise<OrderResponseDto | null> => {
+const findAllOrderByUserId = async (user_id: number): Promise<OrderResponseDto[]> => {
   const result = await pool.query(`
       SELECT *
       FROM orders
       WHERE user_id = $1
+      ORDER BY created_at DESC
     `, [user_id])
-  return result.rows[0] || null
+  return result.rows
 }
 
 const update = async (reqBody: OrderUpdateDto): Promise<OrderResponseDto | null> => {
