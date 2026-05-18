@@ -225,8 +225,11 @@ BEGIN
     SELECT 'Faker Unkillable Demon King Jacket', 'faker-unkillable-demon-king-jacket', 'The official commemorative jacket for Lee "Faker" Sang-hyeok. Features embroidery inspired by his legendary plays.', category_id, TRUE
     FROM categories WHERE category_slug = 'jacket' RETURNING product_id INTO p_id;
     
-    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price)
-    VALUES (p_id, 'FA-UD-JA-L', 300, 'https://images.unsplash.com/photo-1591047139829-d91aec369a70?auto=format&fit=crop&q=80&w=1080', 150.00);
+    INSERT INTO product_items (product_id, sku, stock_quantity, product_item_image, product_item_price) VALUES
+    (p_id, 'FA-UD-JA-S', 50, 'https://images.unsplash.com/photo-1591047139829-d91aec369a70?auto=format&fit=crop&q=80&w=1080', 150.00),
+    (p_id, 'FA-UD-JA-M', 0, 'https://images.unsplash.com/photo-1591047139829-d91aec369a70?auto=format&fit=crop&q=80&w=1080', 150.00),
+    (p_id, 'FA-UD-JA-L', 300, 'https://images.unsplash.com/photo-1591047139829-d91aec369a70?auto=format&fit=crop&q=80&w=1080', 150.00),
+    (p_id, 'FA-UD-JA-XL', 0, 'https://images.unsplash.com/photo-1591047139829-d91aec369a70?auto=format&fit=crop&q=80&w=1080', 150.00);
 
     -- 12. T1 Logo Essential Socks
     INSERT INTO products (product_name, product_slug, product_description, category_id)
