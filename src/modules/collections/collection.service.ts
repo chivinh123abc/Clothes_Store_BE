@@ -1,8 +1,11 @@
+import { slugify } from '../../utils/formatters.js'
 import { CollectionCreateDto, CollectionUpdateDto } from '../types/collections.js'
 import { collectionModel } from './collection.model.js'
 
 const createCollection = async (data: CollectionCreateDto) => {
-  return await collectionModel.create(data)
+  const reqBody = { ...data }
+  reqBody.collection_slug = slugify(reqBody.collection_name)
+  return await collectionModel.create(reqBody)
 }
 
 const getAllCollections = async () => {
@@ -22,7 +25,11 @@ const getCollectionBySlug = async (slug: string) => {
 }
 
 const updateCollection = async (id: number, data: CollectionUpdateDto) => {
-  return await collectionModel.update(id, data)
+  const reqBody = { ...data }
+  if (reqBody.collection_name) {
+    reqBody.collection_slug = slugify(reqBody.collection_name)
+  }
+  return await collectionModel.update(id, reqBody)
 }
 
 const deleteCollection = async (id: number) => {

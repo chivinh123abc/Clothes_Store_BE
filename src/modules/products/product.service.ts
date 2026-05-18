@@ -64,8 +64,8 @@ const update = async (product_id: number, reqBody: ProductUpdateDto): Promise<Pr
     if (reqBody.product_name) {
       reqBody.product_slug = slugify(reqBody.product_name)
       const existProduct2 = await productModel.findProductBySlug(reqBody.product_slug)
-      if (existProduct2) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'This name already exist')
+      if (existProduct2 && existProduct2.product_id !== product_id) {
+        throw new ApiError(StatusCodes.CONFLICT, 'This name already exist')
       }
     }
 

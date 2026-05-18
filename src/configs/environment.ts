@@ -23,5 +23,8 @@ export const env = {
   MAIL_PORT: process.env.MAIL_PORT as string,
   MAIL_USER: process.env.MAIL_USER as string,
   MAIL_PASSWORD: process.env.MAIL_PASSWORD as string,
-  MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS as string
+  MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS as string,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string
 }

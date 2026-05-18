@@ -1,19 +1,98 @@
 import { pool } from '../../configs/database.js'
 import { ProductCreateDto, ProductResponseDto, ProductUpdateDto } from '../types/products.js'
 
-const create = async (reqBody: ProductCreateDto): Promise<ProductResponseDto> => {
-  const createEntries = Object.entries(reqBody).filter(([_, v]) => v !== undefined)
-  const field_keys = createEntries.map(([key]) => `${key}`)
-  const field_values = createEntries.map(([_], index) => `$${index + 1}`)
-  const values = createEntries.map(([_, value]) => value)
+const create = async (reqBody: any): Promise<ProductResponseDto> => {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
 
-  const createData = `
-    INSERT INTO products (${field_keys.join(', ')})
-    VALUES (${field_values.join(', ')})
-    RETURNING *
-  `
-  const createdProduct = await pool.query(createData, values)
-  return createdProduct.rows[0]
+    const { items, collection_ids, ...rawProductData } = reqBody
+
+    // Whitelist only columns that exist in the products table
+    const ALLOWED_PRODUCT_COLUMNS = ['product_name', 'category_id', 'product_slug', 'product_description', 'is_bestseller']
+    const productData = Object.fromEntries(
+      Object.entries(rawProductData).filter(([key]) => ALLOWED_PRODUCT_COLUMNS.includes(key))
+    )
+
+    // 1. Insert product
+    const createEntries = Object.entries(productData).filter(([_, v]) => v !== undefined)
+    const field_keys = createEntries.map(([key]) => `${key}`)
+    const field_values = createEntries.map(([_], index) => `$${index + 1}`)
+    const values = createEntries.map(([_, value]) => value)
+
+    const createProductQuery = `
+      INSERT INTO products (${field_keys.join(', ')})
+      VALUES (${field_values.join(', ')})
+      RETURNING *
+    `
+    const createdProductRes = await client.query(createProductQuery, values)
+    const newProduct = createdProductRes.rows[0]
+    const productId = newProduct.product_id
+
+    // 2. Insert product collections links
+    if (collection_ids && Array.isArray(collection_ids)) {
+      for (const colId of collection_ids) {
+        await client.query(
+          'INSERT INTO product_collections (product_id, collection_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+          [productId, colId]
+        )
+      }
+    }
+
+    // 3. Insert product items (variants)
+    if (items && Array.isArray(items)) {
+      for (const item of items) {
+        const { sku, stock_quantity, product_item_price, size, discount_id, product_item_image } = item
+
+        // Insert product_item
+        const insertItemRes = await client.query(
+          `INSERT INTO product_items (product_id, sku, stock_quantity, product_item_price, product_item_image, discount_id)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING *`,
+          [productId, sku, stock_quantity, product_item_price, product_item_image || null, discount_id || null]
+        )
+        const newItem = insertItemRes.rows[0]
+
+        // Map size string to variant_option_id
+        if (size) {
+          // Find variant_option_id for this category & size
+          let optionRes = await client.query(
+            `SELECT vo.variant_option_id 
+             FROM variant_options vo
+             JOIN variants v ON vo.variant_id = v.variant_id
+             WHERE v.category_id = $1 AND UPPER(vo.variant_option_value) = UPPER($2)
+             LIMIT 1`,
+            [newProduct.category_id, size]
+          )
+
+          // Fallback: search globally
+          if (optionRes.rows.length === 0) {
+            optionRes = await client.query(
+              'SELECT variant_option_id FROM variant_options WHERE UPPER(variant_option_value) = UPPER($1) LIMIT 1',
+              [size]
+            )
+          }
+
+          if (optionRes.rows.length > 0) {
+            const variantOptionId = optionRes.rows[0].variant_option_id
+            await client.query(
+              `INSERT INTO product_configurations (product_item_id, variant_option_id)
+               VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+              [newItem.product_item_id, variantOptionId]
+            )
+          }
+        }
+      }
+    }
+
+    await client.query('COMMIT')
+    return newProduct
+  } catch (error) {
+    await client.query('ROLLBACK')
+    throw error
+  } finally {
+    client.release()
+  }
 }
 
 const findProductById = async (product_id: number): Promise<ProductResponseDto | null> => {
@@ -100,24 +179,175 @@ const findProductBySlug = async (product_slug: string): Promise<ProductResponseD
   return result.rows.length > 0 ? result.rows[0] : null
 }
 
-const update = async (product_id: number, reqBody: ProductUpdateDto): Promise<ProductResponseDto | null> => {
-  const updatedEntries = Object.entries(reqBody).filter(([_, value]) => value !== undefined)
-  if (updatedEntries.length === 0) return null
+const update = async (product_id: number, reqBody: any): Promise<ProductResponseDto | null> => {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
 
-  const fields = updatedEntries.map(([key], index) => `${key} = $${index + 1}`)
-  const value = updatedEntries.map(([_, value]) => value)
+    const { items, collection_ids, ...rawProductData } = reqBody
 
-  fields.push('updated_at = NOW()')
-  value.push(product_id)
+    // Whitelist only columns that exist in the products table
+    const ALLOWED_PRODUCT_COLUMNS = ['product_name', 'category_id', 'product_slug', 'product_description', 'is_bestseller']
+    const productData = Object.fromEntries(
+      Object.entries(rawProductData).filter(([key]) => ALLOWED_PRODUCT_COLUMNS.includes(key))
+    )
 
-  const queryData = `
-    UPDATE products
-    SET ${fields.join(', ')}
-    WHERE product_id = $${updatedEntries.length + 1}
-    RETURNING *
-  `
-  const updatedProduct = await pool.query(queryData, value)
-  return updatedProduct.rows[0]
+    // 1. Update product main fields if any
+    let updatedProduct = null
+    const updatedEntries = Object.entries(productData).filter(([_, value]) => value !== undefined)
+    if (updatedEntries.length > 0) {
+      const fields = updatedEntries.map(([key], index) => `${key} = $${index + 1}`)
+      const value = updatedEntries.map(([_, val]) => val)
+
+      fields.push('updated_at = NOW()')
+      value.push(product_id)
+
+      const queryData = `
+        UPDATE products
+        SET ${fields.join(', ')}
+        WHERE product_id = $${updatedEntries.length + 1}
+        RETURNING *
+      `
+      const updatedProductRes = await client.query(queryData, value)
+      updatedProduct = updatedProductRes.rows[0]
+    } else {
+      const currentProductRes = await client.query('SELECT * FROM products WHERE product_id = $1', [product_id])
+      updatedProduct = currentProductRes.rows[0]
+    }
+
+    if (!updatedProduct) {
+      await client.query('ROLLBACK')
+      return null
+    }
+
+    // 2. Sync product collections links
+    if (collection_ids && Array.isArray(collection_ids)) {
+      await client.query('DELETE FROM product_collections WHERE product_id = $1', [product_id])
+      for (const colId of collection_ids) {
+        await client.query(
+          'INSERT INTO product_collections (product_id, collection_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+          [product_id, colId]
+        )
+      }
+    }
+
+    // 3. Sync product items (variants)
+    if (items && Array.isArray(items)) {
+      // Get all current items
+      const currentItemsRes = await client.query('SELECT product_item_id FROM product_items WHERE product_id = $1', [product_id])
+      const currentItemIds = currentItemsRes.rows.map(r => r.product_item_id)
+
+      // We will keep/update or insert
+      const incomingItemIds: number[] = []
+
+      for (const item of items) {
+        const { product_item_id, sku, stock_quantity, product_item_price, size, discount_id, product_item_image } = item
+
+        if (product_item_id) {
+          // Update existing
+          incomingItemIds.push(product_item_id)
+          await client.query(
+            `UPDATE product_items 
+             SET sku = $1, stock_quantity = $2, product_item_price = $3, product_item_image = $4, discount_id = $5, updated_at = NOW()
+             WHERE product_item_id = $6`,
+            [sku, stock_quantity, product_item_price, product_item_image || null, discount_id || null, product_item_id]
+          )
+
+          // Update size variant option if changed
+          if (size) {
+            await client.query('DELETE FROM product_configurations WHERE product_item_id = $1', [product_item_id])
+
+            // Find variant_option_id for this category & size
+            let optionRes = await client.query(
+              `SELECT vo.variant_option_id 
+               FROM variant_options vo
+               JOIN variants v ON vo.variant_id = v.variant_id
+               WHERE v.category_id = $1 AND UPPER(vo.variant_option_value) = UPPER($2)
+               LIMIT 1`,
+              [updatedProduct.category_id, size]
+            )
+
+            // Fallback: search globally
+            if (optionRes.rows.length === 0) {
+              optionRes = await client.query(
+                'SELECT variant_option_id FROM variant_options WHERE UPPER(variant_option_value) = UPPER($1) LIMIT 1',
+                [size]
+              )
+            }
+
+            if (optionRes.rows.length > 0) {
+              const variantOptionId = optionRes.rows[0].variant_option_id
+              await client.query(
+                `INSERT INTO product_configurations (product_item_id, variant_option_id)
+                 VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+                [product_item_id, variantOptionId]
+              )
+            }
+          }
+        } else {
+          // Insert new item
+          const insertItemRes = await client.query(
+            `INSERT INTO product_items (product_id, sku, stock_quantity, product_item_price, product_item_image, discount_id)
+             VALUES ($1, $2, $3, $4, $5, $6)
+             RETURNING *`,
+            [product_id, sku, stock_quantity, product_item_price, product_item_image || null, discount_id || null]
+          )
+          const newItem = insertItemRes.rows[0]
+          incomingItemIds.push(newItem.product_item_id)
+
+          if (size) {
+            // Find variant_option_id for this category & size
+            let optionRes = await client.query(
+              `SELECT vo.variant_option_id 
+               FROM variant_options vo
+               JOIN variants v ON vo.variant_id = v.variant_id
+               WHERE v.category_id = $1 AND UPPER(vo.variant_option_value) = UPPER($2)
+               LIMIT 1`,
+              [updatedProduct.category_id, size]
+            )
+
+            // Fallback: search globally
+            if (optionRes.rows.length === 0) {
+              optionRes = await client.query(
+                'SELECT variant_option_id FROM variant_options WHERE UPPER(variant_option_value) = UPPER($1) LIMIT 1',
+                [size]
+              )
+            }
+
+            if (optionRes.rows.length > 0) {
+              const variantOptionId = optionRes.rows[0].variant_option_id
+              await client.query(
+                `INSERT INTO product_configurations (product_item_id, variant_option_id)
+                 VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+                [newItem.product_item_id, variantOptionId]
+              )
+            }
+          }
+        }
+      }
+
+      // Delete items not in incomingItemIds
+      const itemsToDelete = currentItemIds.filter(id => !incomingItemIds.includes(id))
+      if (itemsToDelete.length > 0) {
+        await client.query(
+          'DELETE FROM product_configurations WHERE product_item_id = ANY($1)',
+          [itemsToDelete]
+        )
+        await client.query(
+          'DELETE FROM product_items WHERE product_item_id = ANY($1)',
+          [itemsToDelete]
+        )
+      }
+    }
+
+    await client.query('COMMIT')
+    return updatedProduct
+  } catch (error) {
+    await client.query('ROLLBACK')
+    throw error
+  } finally {
+    client.release()
+  }
 }
 
 const findAll = async (): Promise<ProductResponseDto[]> => {

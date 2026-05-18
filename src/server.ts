@@ -17,7 +17,7 @@ const START_SERVER = () => {
     origin: env.CLIENT_URL,
     credentials: true
   }))
-  app.use(express.json())
+  app.use(express.json({ limit: '10mb' }))
   app.use(cookieParser())
   // dung swagger UI
   setupSwagger(app)
