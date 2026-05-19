@@ -10,16 +10,18 @@ import { paymentRoute } from '../modules/payment/payment.route.js'
 import { productConfigurationRoute } from '../modules/product_configurations/product_configurations.route.js'
 import { productItemRoute } from '../modules/product_items/product_item.route.js'
 import { productRoute } from '../modules/products/product.route.js'
+import { reviewsRoute } from '../modules/reviews/reviews.route.js'
 import { adminUserRoute } from '../modules/users/admin_user.route.js'
 import { userRoute } from '../modules/users/user.route.js'
 import { variantOptionRoute } from '../modules/variant_options/variant_option.route.js'
 import { variantRoute } from '../modules/variants/variant.route.js'
-import { uploadRoute, userUploadRoute } from './upload.route.js'
+import { uploadRoute, userUploadRoute, reviewUploadRoute } from './upload.route.js'
 
 const Router = express.Router()
 
 Router.use('/user', userRoute)
 Router.use('/user/upload', userUploadRoute)
+Router.use('/user/upload-review', reviewUploadRoute)
 Router.use('/admin/users', adminUserRoute)
 Router.use('/admin/upload', uploadRoute)
 
@@ -32,6 +34,8 @@ Router.use('/collection', collectionRoute)
 Router.use('/discount', discountRoute)
 
 Router.use('/product_item', productItemRoute)
+
+Router.use('/reviews', reviewsRoute)
 
 Router.use('/variant', variantRoute)
 

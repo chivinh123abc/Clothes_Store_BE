@@ -51,6 +51,7 @@ const findAllByOrderId = async (order_id: number): Promise<any[]> => {
   const result = await pool.query(`
     SELECT 
       oi.*, 
+      p.product_id as product_id,
       pi.product_item_image as image, 
       pi.product_item_image as product_item_image,
       p.product_name as name, 
