@@ -26,4 +26,6 @@ export declare const env: {
     MOMO_ACCESS_KEY: string;
     MOMO_SECRET_KEY: string;
     MOMO_ENDPOINT: string;
+    REDIS_HOST: string;
+    REDIS_PORT: string;
 };

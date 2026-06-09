@@ -40,7 +40,27 @@ const sendVerificationEmail = (to, username, token) => __awaiter(void 0, void 0,
     };
     return yield transporter.sendMail(mailOptions);
 });
+const sendForgotPasswordEmail = (to, username, otpCode) => __awaiter(void 0, void 0, void 0, function* () {
+    const mailOptions = {
+        from: env.MAIL_FROM_ADDRESS,
+        to: to,
+        subject: 'Your Password Reset OTP Code',
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #111111; color: white;">
+        <h2 style="color: #e2012d; text-align: center;">RINSTORE PASSWORD RECOVERY</h2>
+        <p style="color: #ccc;">Hello, ${username}!</p>
+        <p style="color: #ccc;">You requested to reset your password. Use the verification code below to complete the reset process:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="display: inline-block; background-color: #222; border: 1px solid #e2012d; color: #e2012d; font-size: 32px; font-weight: bold; padding: 15px 30px; letter-spacing: 5px; border-radius: 5px; font-family: monospace;">${otpCode}</span>
+        </div>
+        <p style="color: #888; font-size: 12px; text-align: center;">This code is valid for 5 minutes. If you didn't request a password reset, you can safely ignore this email.</p>
+      </div>
+    `
+    };
+    return yield transporter.sendMail(mailOptions);
+});
 export const MailProvider = {
-    sendVerificationEmail
+    sendVerificationEmail,
+    sendForgotPasswordEmail
 };
 //# sourceMappingURL=MailProvider.js.map

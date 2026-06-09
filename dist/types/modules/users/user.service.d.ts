@@ -18,4 +18,10 @@ export declare const userService: {
     resendVerification: (email: string) => Promise<{
         message: string;
     }>;
+    forgotPassword: (email: string) => Promise<{
+        message: string;
+    }>;
+    resetPassword: (reqBody: any) => Promise<{
+        message: string;
+    }>;
 };

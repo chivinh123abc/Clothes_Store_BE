@@ -167,6 +167,25 @@ const resendVerification = (req, res, next) => __awaiter(void 0, void 0, void 0,
         next(error);
     }
 });
+const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        const result = yield userService.forgotPassword(email);
+        res.status(StatusCodes.OK).json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
+const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield userService.resetPassword(req.body);
+        res.status(StatusCodes.OK).json(result);
+    }
+    catch (error) {
+        next(error);
+    }
+});
 export const userController = {
     createNew,
     getUser,
@@ -180,6 +199,8 @@ export const userController = {
     adminUpdate,
     adminDelete,
     adminCreate,
-    resendVerification
+    resendVerification,
+    forgotPassword,
+    resetPassword
 };
 //# sourceMappingURL=user.controller.js.map

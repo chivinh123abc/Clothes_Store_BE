@@ -16,6 +16,9 @@ Router.route('/update').put(authMiddleware.isAuthorized, userValidation.update, 
 Router.route('/verify-account').post(userValidation.verifyAccount, userController.verifyAccount)
 Router.route('/resend-verification').post(userController.resendVerification)
 
+Router.route('/forgot-password').post(userValidation.forgotPassword, userController.forgotPassword)
+Router.route('/reset-password').post(userValidation.resetPassword, userController.resetPassword)
+
 Router.route('/login').post(userValidation.login, userController.login)
 
 Router.route('/logout').delete(userController.logout)

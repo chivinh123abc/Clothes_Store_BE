@@ -110,10 +110,52 @@ export const login = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage));
     }
 });
+export const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const correctCondition = Joi.object({
+        email: Joi.string().email().required()
+    });
+    try {
+        yield correctCondition.validateAsync(req.body, { abortEarly: false });
+        next();
+    }
+    catch (error) {
+        let errorMessage = 'Unaccepted Input';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage));
+    }
+});
+export const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const correctCondition = Joi.object({
+        email: Joi.string().email().required(),
+        token: Joi.string().required(),
+        password: Joi.string().min(6).required()
+    });
+    try {
+        yield correctCondition.validateAsync(req.body, { abortEarly: false });
+        next();
+    }
+    catch (error) {
+        let errorMessage = 'Unaccepted Input';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        else if (typeof error === 'string') {
+            errorMessage = error;
+        }
+        next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage));
+    }
+});
 export const userValidation = {
     createNew,
     update,
     verifyAccount,
-    login
+    login,
+    forgotPassword,
+    resetPassword
 };
 //# sourceMappingURL=user.validation.js.map

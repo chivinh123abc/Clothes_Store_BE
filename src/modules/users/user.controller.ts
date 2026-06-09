@@ -172,6 +172,25 @@ const resendVerification = async (req: Request, res: Response, next: NextFunctio
   }
 }
 
+const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body
+    const result = await userService.forgotPassword(email)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await userService.resetPassword(req.body)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const userController = {
   createNew,
   getUser,
@@ -185,5 +204,7 @@ export const userController = {
   adminUpdate,
   adminDelete,
   adminCreate,
-  resendVerification
+  resendVerification,
+  forgotPassword,
+  resetPassword
 }

@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../utils/ApiError.js';
 import { orderModel } from '../orders/order.model.js';
-import { productItemModel } from '../product_items/product_item.model.js';
 import { orderItemModel } from './order_item.model.js';
 const createNew = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -19,16 +18,13 @@ const createNew = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
         if (!existOrder) {
             throw (new ApiError(StatusCodes.NOT_FOUND, 'Order not exist'));
         }
-        // Kiem tra Product Item
-        const existProductItem = yield productItemModel.findProductItemById(reqBody.product_item_id);
-        if (!existProductItem) {
-            throw (new ApiError(StatusCodes.NOT_FOUND, 'Product_item not exist'));
-        }
-        reqBody.unit_price = Number(existProductItem.sale_price !== undefined && existProductItem.sale_price !== null ? existProductItem.sale_price : existProductItem.product_item_price);
-        const result = yield orderItemModel.create(reqBody);
+        const result = yield orderItemModel.createWithStockUpdate(reqBody);
         return result;
     }
     catch (error) {
+        if (error.message.includes('không đủ số lượng') || error.message.includes('variant does not exist')) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, error.message);
+        }
         throw error;
     }
 });

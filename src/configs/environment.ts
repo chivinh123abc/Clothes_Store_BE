@@ -32,5 +32,9 @@ export const env = {
   MOMO_PARTNER_CODE: process.env.MOMO_PARTNER_CODE as string,
   MOMO_ACCESS_KEY: process.env.MOMO_ACCESS_KEY as string,
   MOMO_SECRET_KEY: process.env.MOMO_SECRET_KEY as string,
-  MOMO_ENDPOINT: process.env.MOMO_ENDPOINT as string
+  MOMO_ENDPOINT: process.env.MOMO_ENDPOINT as string,
+
+  // REDIS
+  REDIS_HOST: process.env.REDIS_HOST as string,
+  REDIS_PORT: process.env.REDIS_PORT as string
 }

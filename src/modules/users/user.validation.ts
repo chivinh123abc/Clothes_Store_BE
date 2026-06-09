@@ -111,9 +111,51 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const correctCondition = Joi.object({
+    email: Joi.string().email().required()
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    let errorMessage = 'Unaccepted Input'
+    if (error instanceof Error) {
+      errorMessage = error.message
+    } else if (typeof error === 'string') {
+      errorMessage = error
+    }
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage))
+  }
+}
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const correctCondition = Joi.object({
+    email: Joi.string().email().required(),
+    token: Joi.string().required(),
+    password: Joi.string().min(6).required()
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    let errorMessage = 'Unaccepted Input'
+    if (error instanceof Error) {
+      errorMessage = error.message
+    } else if (typeof error === 'string') {
+      errorMessage = error
+    }
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage))
+  }
+}
+
 export const userValidation = {
   createNew,
   update,
   verifyAccount,
-  login
+  login,
+  forgotPassword,
+  resetPassword
 }

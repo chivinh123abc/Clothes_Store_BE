@@ -4,12 +4,13 @@ import cors from 'cors'
 import { asyncExitHook } from 'exit-hook'
 import express from 'express'
 import { pool } from './configs/database.js'
+import { RedisProvider } from './providers/RedisProvider.js'
 import { env } from './configs/environment.js'
 import { setupSwagger } from './configs/swagger.js'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js'
 import { APIs } from './routes/index.js'
 
-const START_SERVER = () => {
+const START_SERVER = async () => {
   const app = express()
 
   //phan ben trong {} dung de chi dinh BE origin va FE tu domain khac, nen la phai dung
@@ -39,11 +40,15 @@ const START_SERVER = () => {
       console.log(`Swagger docs at http://localhost:${PORT}/api-docs`)
     }
   })
+  // Ket noi Redis
+  await RedisProvider.connect()
+
   // EXIT HOOK
   asyncExitHook(async () => {
     console.log('[SERVER]: Server is shutting down')
     pool.end()
     console.log('[DATABASE]: Database is shutting down')
+    await RedisProvider.disconnect()
   }, {
     wait: 300
   })

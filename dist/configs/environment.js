@@ -26,6 +26,9 @@ export const env = {
     MOMO_PARTNER_CODE: process.env.MOMO_PARTNER_CODE,
     MOMO_ACCESS_KEY: process.env.MOMO_ACCESS_KEY,
     MOMO_SECRET_KEY: process.env.MOMO_SECRET_KEY,
-    MOMO_ENDPOINT: process.env.MOMO_ENDPOINT
+    MOMO_ENDPOINT: process.env.MOMO_ENDPOINT,
+    // REDIS
+    REDIS_HOST: process.env.REDIS_HOST,
+    REDIS_PORT: process.env.REDIS_PORT
 };
 //# sourceMappingURL=environment.js.map

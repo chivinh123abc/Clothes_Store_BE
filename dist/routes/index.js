@@ -16,7 +16,6 @@ import { userRoute } from '../modules/users/user.route.js';
 import { variantOptionRoute } from '../modules/variant_options/variant_option.route.js';
 import { variantRoute } from '../modules/variants/variant.route.js';
 import { uploadRoute, userUploadRoute, reviewUploadRoute } from './upload.route.js';
-import { advisorRoute } from '../modules/advisor/advisor.route.js';
 const Router = express.Router();
 Router.use('/user', userRoute);
 Router.use('/user/upload', userUploadRoute);
@@ -37,6 +36,5 @@ Router.use('/order_item', orderItemRoute);
 Router.use('/cart', cartRoute);
 Router.use('/cart_item', cartItemRoute);
 Router.use('/payment', paymentRoute);
-Router.use('/advisor', advisorRoute);
 export const APIs = Router;
 //# sourceMappingURL=index.js.map

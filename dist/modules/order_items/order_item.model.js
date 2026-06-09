@@ -91,8 +91,64 @@ const findAllByOrderId = (order_id) => __awaiter(void 0, void 0, void 0, functio
   `, [order_id]);
     return result.rows;
 });
+const createWithStockUpdate = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
+    const client = yield pool.connect();
+    try {
+        yield client.query('BEGIN');
+        // 1. SELECT ... FOR UPDATE to lock the product item row and get current stock
+        const lockRes = yield client.query(`SELECT stock_quantity, product_item_price, discount_id, product_id
+       FROM product_items
+       WHERE product_item_id = $1
+       FOR UPDATE`, [reqBody.product_item_id]);
+        if (lockRes.rows.length === 0) {
+            throw new Error('Product variant does not exist');
+        }
+        const { stock_quantity, product_item_price, discount_id, product_id } = lockRes.rows[0];
+        // 2. Validate stock
+        // Fetch product name and discount percentage (no lock needed since these are lookup values that don't change during checkout)
+        const detailsRes = yield client.query(`SELECT p.product_name, d.discount_percent, d.active
+       FROM products p
+       LEFT JOIN discounts d ON d.discount_id = $1
+       WHERE p.product_id = $2`, [discount_id, product_id]);
+        const productName = ((_a = detailsRes.rows[0]) === null || _a === void 0 ? void 0 : _a.product_name) || 'Product';
+        const discountPercent = ((_b = detailsRes.rows[0]) === null || _b === void 0 ? void 0 : _b.active) ? (_c = detailsRes.rows[0]) === null || _c === void 0 ? void 0 : _c.discount_percent : null;
+        if (stock_quantity < reqBody.quantity) {
+            throw new Error(`Sản phẩm "${productName}" không đủ số lượng trong kho (chỉ còn ${stock_quantity} sản phẩm)`);
+        }
+        // 3. Decrement stock
+        yield client.query(`UPDATE product_items 
+       SET stock_quantity = stock_quantity - $1, updated_at = NOW() 
+       WHERE product_item_id = $2`, [reqBody.quantity, reqBody.product_item_id]);
+        // 4. Calculate unit price
+        const unitPrice = Number(discountPercent !== null && discountPercent !== undefined
+            ? product_item_price * (1 - discountPercent / 100)
+            : product_item_price);
+        const orderItemPayload = Object.assign(Object.assign({}, reqBody), { unit_price: unitPrice });
+        const createdEntries = Object.entries(orderItemPayload).filter(([k, v]) => v !== undefined);
+        const fields = createdEntries.map(([k]) => k);
+        const indexs = createdEntries.map(([], index) => `$${index + 1}`);
+        const values = createdEntries.map(([_, v]) => v);
+        const insertQuery = `
+      INSERT INTO order_items(${fields.join(', ')})
+      VALUES(${indexs.join(', ')})
+      RETURNING *
+    `;
+        const insertRes = yield client.query(insertQuery, values);
+        yield client.query('COMMIT');
+        return insertRes.rows[0];
+    }
+    catch (error) {
+        yield client.query('ROLLBACK');
+        throw error;
+    }
+    finally {
+        client.release();
+    }
+});
 export const orderItemModel = {
     create,
+    createWithStockUpdate,
     getOrderItemById,
     update,
     findAllByOrderId

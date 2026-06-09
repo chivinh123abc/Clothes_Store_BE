@@ -95,8 +95,86 @@ const findAllByOrderId = async (order_id: number): Promise<any[]> => {
   return result.rows
 }
 
+const createWithStockUpdate = async (reqBody: OrderItemCreateDto): Promise<OrderItemResponseDto> => {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+
+    // 1. SELECT ... FOR UPDATE to lock the product item row and get current stock
+    const lockRes = await client.query(
+      `SELECT stock_quantity, product_item_price, discount_id, product_id
+       FROM product_items
+       WHERE product_item_id = $1
+       FOR UPDATE`,
+      [reqBody.product_item_id]
+    )
+
+    if (lockRes.rows.length === 0) {
+      throw new Error('Product variant does not exist')
+    }
+
+    const { stock_quantity, product_item_price, discount_id, product_id } = lockRes.rows[0]
+
+    // 2. Validate stock
+    // Fetch product name and discount percentage (no lock needed since these are lookup values that don't change during checkout)
+    const detailsRes = await client.query(
+      `SELECT p.product_name, d.discount_percent, d.active
+       FROM products p
+       LEFT JOIN discounts d ON d.discount_id = $1
+       WHERE p.product_id = $2`,
+      [discount_id, product_id]
+    )
+
+    const productName = detailsRes.rows[0]?.product_name || 'Product'
+    const discountPercent = detailsRes.rows[0]?.active ? detailsRes.rows[0]?.discount_percent : null
+
+    if (stock_quantity < reqBody.quantity) {
+      throw new Error(`Sản phẩm "${productName}" không đủ số lượng trong kho (chỉ còn ${stock_quantity} sản phẩm)`)
+    }
+
+    // 3. Decrement stock
+    await client.query(
+      `UPDATE product_items 
+       SET stock_quantity = stock_quantity - $1, updated_at = NOW() 
+       WHERE product_item_id = $2`,
+      [reqBody.quantity, reqBody.product_item_id]
+    )
+
+    // 4. Calculate unit price
+    const unitPrice = Number(discountPercent !== null && discountPercent !== undefined
+      ? product_item_price * (1 - discountPercent / 100)
+      : product_item_price)
+    const orderItemPayload = {
+      ...reqBody,
+      unit_price: unitPrice
+    }
+
+    const createdEntries = Object.entries(orderItemPayload).filter(([k, v]) => v !== undefined)
+    const fields = createdEntries.map(([k]) => k)
+    const indexs = createdEntries.map(([], index) => `$${index + 1}`)
+    const values = createdEntries.map(([_, v]) => v)
+
+    const insertQuery = `
+      INSERT INTO order_items(${fields.join(', ')})
+      VALUES(${indexs.join(', ')})
+      RETURNING *
+    `
+
+    const insertRes = await client.query(insertQuery, values)
+    
+    await client.query('COMMIT')
+    return insertRes.rows[0]
+  } catch (error) {
+    await client.query('ROLLBACK')
+    throw error
+  } finally {
+    client.release()
+  }
+}
+
 export const orderItemModel = {
   create,
+  createWithStockUpdate,
   getOrderItemById,
   update,
   findAllByOrderId

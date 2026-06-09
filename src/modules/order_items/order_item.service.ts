@@ -12,17 +12,13 @@ const createNew = async (reqBody: OrderItemCreateDto): Promise<OrderItemResponse
     if (!existOrder) {
       throw (new ApiError(StatusCodes.NOT_FOUND, 'Order not exist'))
     }
-    // Kiem tra Product Item
-    const existProductItem = await productItemModel.findProductItemById(reqBody.product_item_id)
-    if (!existProductItem) {
-      throw (new ApiError(StatusCodes.NOT_FOUND, 'Product_item not exist'))
-    }
 
-    reqBody.unit_price = Number(existProductItem.sale_price !== undefined && existProductItem.sale_price !== null ? existProductItem.sale_price : existProductItem.product_item_price)
-
-    const result = await orderItemModel.create(reqBody)
+    const result = await orderItemModel.createWithStockUpdate(reqBody)
     return result
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message.includes('không đủ số lượng') || error.message.includes('variant does not exist')) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, error.message)
+    }
     throw error
   }
 }

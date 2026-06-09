@@ -4,6 +4,7 @@ import { v7 as uuidv7 } from 'uuid'
 import { env } from '../../configs/environment.js'
 import { JwtProvider } from '../../providers/JwtProvider.js'
 import { MailProvider } from '../../providers/MailProvider.js'
+import { RedisProvider } from '../../providers/RedisProvider.js'
 import ApiError from '../../utils/ApiError.js'
 import { pickUser } from '../../utils/formatters.js'
 import {
@@ -325,6 +326,64 @@ const resendVerification = async (email: string) => {
   }
 }
 
+const generateAlphanumericOTP = (length: number = 6): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
+const forgotPassword = async (email: string) => {
+  try {
+    const existUser = await userModel.findUserByEmail(email)
+    if (!existUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User with this email does not exist')
+    }
+
+    const otpCode = generateAlphanumericOTP(6)
+    // Lưu OTP vào Redis với TTL 5 phút (300 giây)
+    await RedisProvider.setOTP(email, otpCode, 300)
+    await MailProvider.sendForgotPasswordEmail(existUser.email!, existUser.username!, otpCode)
+
+    return { message: 'OTP code sent to email successfully' }
+  } catch (error) {
+    throw error
+  }
+}
+
+const resetPassword = async (reqBody: any) => {
+  try {
+    const { email, token, password } = reqBody
+    const existUser = await userModel.findUserByEmail(email)
+    if (!existUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+    }
+
+    // Lấy OTP từ Redis
+    const savedOTP = await RedisProvider.getOTP(email)
+    if (!savedOTP) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'OTP code has expired or no active password reset request found')
+    }
+
+    if (savedOTP !== token) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid OTP code')
+    }
+
+    const updatedData: UserUpdateDto = {
+      password: bcrypt.hashSync(password, 8)
+    }
+
+    await userModel.update(existUser.user_id!, updatedData)
+    // Xoá OTP khỏi Redis sau khi reset thành công
+    await RedisProvider.deleteOTP(email)
+    return { message: 'Password has been reset successfully' }
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
   createNew,
   getUser,
@@ -337,5 +396,7 @@ export const userService = {
   adminUpdate,
   adminDelete,
   adminCreate,
-  resendVerification
+  resendVerification,
+  forgotPassword,
+  resetPassword
 }
