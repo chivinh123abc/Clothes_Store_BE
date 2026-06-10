@@ -15,7 +15,8 @@ const create = async (userId: number, productId: number, rating: number, text: s
 const findByProductId = async (productId: number): Promise<any[]> => {
   const result = await pool.query(
     `
-      SELECT r.*, u.username, u.avatar, u.display_name
+      SELECT r.*, u.username, u.avatar, u.display_name,
+             (SELECT product_item_image FROM product_items pi WHERE pi.product_id = r.product_id LIMIT 1) as product_image
       FROM reviews r
       JOIN users u ON r.user_id = u.user_id
       WHERE r.product_id = $1
@@ -29,7 +30,8 @@ const findByProductId = async (productId: number): Promise<any[]> => {
 const findAllReviews = async (): Promise<any[]> => {
   const result = await pool.query(
     `
-      SELECT r.*, u.username, u.avatar, u.display_name, p.product_name as product
+      SELECT r.*, u.username, u.avatar, u.display_name, p.product_name as product,
+             (SELECT product_item_image FROM product_items pi WHERE pi.product_id = r.product_id LIMIT 1) as product_image
       FROM reviews r
       JOIN users u ON r.user_id = u.user_id
       JOIN products p ON r.product_id = p.product_id
