@@ -12,18 +12,41 @@ import { env } from '../configs/environment.js';
 const client = new Redis({
     host: env.REDIS_HOST || 'localhost',
     port: Number(env.REDIS_PORT) || 6379,
-    lazyConnect: true
+    lazyConnect: true,
+    // Tự động retry khi mất kết nối
+    retryStrategy: (times) => {
+        if (times > 5) {
+            // eslint-disable-next-line no-console
+            console.error('[REDIS] Max retry attempts reached. Giving up.');
+            return null; // Dừng retry
+        }
+        const delay = Math.min(times * 500, 3000); // 500ms, 1s, 1.5s... tối đa 3s
+        // eslint-disable-next-line no-console
+        console.log(`[REDIS] Retrying connection in ${delay}ms (attempt ${times})...`);
+        return delay;
+    }
 });
 client.on('error', (err) => {
     // eslint-disable-next-line no-console
-    console.error('[REDIS] Redis Client Error:', err);
+    console.error('[REDIS] Redis Client Error:', err.message);
 });
 client.on('connect', () => {
     // eslint-disable-next-line no-console
     console.log('[REDIS] Connected to Redis successfully');
 });
+client.on('reconnecting', () => {
+    // eslint-disable-next-line no-console
+    console.log('[REDIS] Reconnecting to Redis...');
+});
 const connect = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield client.connect();
+    try {
+        yield client.connect();
+    }
+    catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('[REDIS] Failed to connect to Redis:', err.message);
+        // Không throw - để server vẫn chạy được, chỉ thiếu tính năng OTP
+    }
 });
 // Lưu OTP vào Redis với TTL (giây), mặc định 5 phút
 const setOTP = (email_1, otp_1, ...args_1) => __awaiter(void 0, [email_1, otp_1, ...args_1], void 0, function* (email, otp, ttlSeconds = 300) {
@@ -41,9 +64,14 @@ const deleteOTP = (email) => __awaiter(void 0, void 0, void 0, function* () {
     yield client.del(key);
 });
 const disconnect = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield client.quit();
-    // eslint-disable-next-line no-console
-    console.log('[REDIS] Disconnected from Redis');
+    try {
+        yield client.quit();
+        // eslint-disable-next-line no-console
+        console.log('[REDIS] Disconnected from Redis');
+    }
+    catch (_a) {
+        // Bỏ qua lỗi khi disconnect
+    }
 });
 export const RedisProvider = {
     connect,

@@ -162,6 +162,26 @@ const createWithStockUpdate = async (reqBody: OrderItemCreateDto): Promise<Order
 
     const insertRes = await client.query(insertQuery, values)
     
+    // Recalculate and update the total_amount of the parent order
+    const orderId = insertRes.rows[0].order_id
+    await client.query(
+      `UPDATE orders 
+       SET total_amount = (
+         SELECT COALESCE(
+           CASE 
+             WHEN SUM(unit_price * quantity) > 100 
+             THEN SUM(unit_price * quantity) 
+             ELSE SUM(unit_price * quantity) + 5.0 
+           END, 
+           0.0
+         )
+         FROM order_items 
+         WHERE order_id = $1
+       )
+       WHERE order_id = $1`,
+      [orderId]
+    )
+
     await client.query('COMMIT')
     return insertRes.rows[0]
   } catch (error) {

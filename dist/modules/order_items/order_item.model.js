@@ -135,6 +135,22 @@ const createWithStockUpdate = (reqBody) => __awaiter(void 0, void 0, void 0, fun
       RETURNING *
     `;
         const insertRes = yield client.query(insertQuery, values);
+        // Recalculate and update the total_amount of the parent order
+        const orderId = insertRes.rows[0].order_id;
+        yield client.query(`UPDATE orders 
+       SET total_amount = (
+         SELECT COALESCE(
+           CASE 
+             WHEN SUM(unit_price * quantity) > 100 
+             THEN SUM(unit_price * quantity) 
+             ELSE SUM(unit_price * quantity) + 5.0 
+           END, 
+           0.0
+         )
+         FROM order_items 
+         WHERE order_id = $1
+       )
+       WHERE order_id = $1`, [orderId]);
         yield client.query('COMMIT');
         return insertRes.rows[0];
     }

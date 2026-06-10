@@ -14,11 +14,19 @@ import { orderModel } from '../orders/order.model.js';
 import { createMoMoPaymentUrl } from './payment.service.js';
 export const createMoMo = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { order_id, amount, orderInfo } = req.body;
-        if (!order_id || !amount) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing order_id or amount' });
+        const { order_id, orderInfo } = req.body;
+        if (!order_id) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing order_id' });
         }
-        const payUrl = yield createMoMoPaymentUrl(order_id, amount, orderInfo || 'Thanh toan don hang T1');
+        const order = yield orderModel.findOrderById(Number(order_id));
+        if (!order) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Order not found' });
+        }
+        const dbAmount = Number(order.total_amount);
+        if (!dbAmount || dbAmount <= 0) {
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid order amount' });
+        }
+        const payUrl = yield createMoMoPaymentUrl(Number(order_id), dbAmount, orderInfo || 'Thanh toan don hang T1');
         res.status(StatusCodes.OK).json({ payUrl });
     }
     catch (error) {

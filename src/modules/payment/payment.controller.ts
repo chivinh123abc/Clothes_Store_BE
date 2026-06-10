@@ -7,13 +7,23 @@ import { createMoMoPaymentUrl } from './payment.service.js'
 
 export const createMoMo = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { order_id, amount, orderInfo } = req.body
+    const { order_id, orderInfo } = req.body
 
-    if (!order_id || !amount) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing order_id or amount' })
+    if (!order_id) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Missing order_id' })
     }
 
-    const payUrl = await createMoMoPaymentUrl(order_id, amount, orderInfo || 'Thanh toan don hang T1')
+    const order = await orderModel.findOrderById(Number(order_id))
+    if (!order) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: 'Order not found' })
+    }
+
+    const dbAmount = Number(order.total_amount)
+    if (!dbAmount || dbAmount <= 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid order amount' })
+    }
+
+    const payUrl = await createMoMoPaymentUrl(Number(order_id), dbAmount, orderInfo || 'Thanh toan don hang T1')
     res.status(StatusCodes.OK).json({ payUrl })
   } catch (error: any) {
     // eslint-disable-next-line no-console
