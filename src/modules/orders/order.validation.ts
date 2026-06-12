@@ -9,7 +9,7 @@ const createNew = async (req: Request, res: Response, next: NextFunction) => {
     user_id: Joi.number().integer().min(1).required(),
     status: Joi.string().valid(...Object.values(OrderStatus)).default(OrderStatus.PENDING),
     total_amount: Joi.number().precision(2).min(0).default(0),
-    payment_method: Joi.string().min(2).max(50).default('cod'),
+    payment_method: Joi.string().valid('cod', 'momo').default('cod'),
     payment_status: Joi.string().valid('unpaid', 'paid').default('unpaid'),
     comment: Joi.string().min(5).max(255).optional()
   })
@@ -34,7 +34,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     user_id: Joi.number().integer().min(1).optional(),
     status: Joi.string().valid(...Object.values(OrderStatus)).optional(),
     total_amount: Joi.number().precision(2).min(0).optional(),
-    payment_method: Joi.string().min(2).max(50).optional(),
+    payment_method: Joi.string().valid('cod', 'momo').optional(),
     payment_status: Joi.string().valid('unpaid', 'paid').optional(),
     comment: Joi.string().min(5).max(255).optional()
   }).min(1)
