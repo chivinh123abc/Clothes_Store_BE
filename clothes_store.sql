@@ -333,7 +333,8 @@ CREATE TABLE public.orders (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone,
     payment_method character varying(50) DEFAULT 'cod'::character varying,
-    payment_status character varying(20) DEFAULT 'unpaid'::character varying
+    payment_status character varying(20) DEFAULT 'unpaid'::character varying,
+    CONSTRAINT orders_payment_method_check CHECK ((payment_method::text = ANY (ARRAY['cod'::text, 'momo'::text])))
 );
 
 
@@ -3357,6 +3358,15 @@ ALTER TABLE ONLY public.variant_options
 
 ALTER TABLE ONLY public.variants
     ADD CONSTRAINT variants_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(category_id) ON DELETE RESTRICT;
+
+
+--
+-- TOC entry 3431 (class 2606 OID 16660)
+-- Name: orders orders_payment_method_check; Type: CHECK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.orders
+    ADD CONSTRAINT orders_payment_method_check CHECK ((payment_method::text = ANY (ARRAY['cod'::text, 'momo'::text])));
 
 
 -- Completed on 2026-06-10 18:48:44
