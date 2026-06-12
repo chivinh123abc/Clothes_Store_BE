@@ -161,7 +161,7 @@ const createWithStockUpdate = async (reqBody: OrderItemCreateDto): Promise<Order
     `
 
     const insertRes = await client.query(insertQuery, values)
-    
+
     // Recalculate and update the total_amount of the parent order
     const orderId = insertRes.rows[0].order_id
     await client.query(
