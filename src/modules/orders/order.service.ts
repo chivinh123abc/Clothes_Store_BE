@@ -26,6 +26,60 @@ const update = async (reqBody: OrderUpdateDto): Promise<OrderResponseDto> => {
       throw (new ApiError(StatusCodes.NOT_FOUND, 'Order not found'))
     }
 
+    const currentStatus = existOrder.status.toLowerCase()
+    const paymentMethod = existOrder.payment_method?.toLowerCase()
+    const targetStatus = reqBody.status?.toLowerCase() || currentStatus
+
+    if (reqBody.status) {
+      const newStatus = reqBody.status.toLowerCase()
+
+      const allowedTransitions: Record<string, string[]> = paymentMethod === 'cod'
+        ? {
+          pending: ['shipping', 'cancelled'],
+          shipping: ['completed', 'cancelled'],
+          completed: [],
+          cancelled: []
+        }
+        : {
+          pending: ['paid', 'cancelled'],
+          paid: ['shipping', 'cancelled'],
+          shipping: ['completed'],
+          completed: [],
+          cancelled: []
+        }
+
+      const allowed = allowedTransitions[currentStatus] || []
+      if (!allowed.includes(newStatus) && newStatus !== currentStatus) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          `Cannot change order status from '${currentStatus}' to '${newStatus}'`
+        )
+      }
+    }
+
+    // Automatically set payment status to 'paid' for COD orders when status becomes 'completed'
+    if (paymentMethod === 'cod' && targetStatus === 'completed') {
+      reqBody.payment_status = 'paid'
+    }
+
+    if (reqBody.payment_status) {
+      const newPaymentStatus = reqBody.payment_status.toLowerCase()
+
+      if (paymentMethod === 'momo') {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'Cannot manually update payment status for MoMo orders'
+        )
+      }
+
+      if (paymentMethod === 'cod' && newPaymentStatus === 'paid' && targetStatus !== 'completed') {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'COD payment status can only be set to paid when order is completed'
+        )
+      }
+    }
+
     if (reqBody.user_id) {
       const existUser = await userModel.findUserById(reqBody.user_id)
       if (!existUser) {
@@ -34,11 +88,9 @@ const update = async (reqBody: OrderUpdateDto): Promise<OrderResponseDto> => {
     }
 
     const updatedOrder = await orderModel.update(reqBody)
-
     if (!updatedOrder) {
       throw (new ApiError(StatusCodes.CONFLICT, 'Updated Failed'))
     }
-
     return updatedOrder
   } catch (error) {
     throw (error)
@@ -53,9 +105,9 @@ const getOrder = async (order_id: number): Promise<any> => {
     if (!existOrder) {
       throw (new ApiError(StatusCodes.NOT_FOUND, 'Order not found'))
     }
-    
+
     const items = await orderItemModel.findAllByOrderId(order_id)
-    
+
     return {
       ...existOrder,
       items
